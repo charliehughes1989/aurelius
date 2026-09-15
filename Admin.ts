@@ -1,0 +1,14 @@
+import { Router } from 'express';
+import { readJson, writeJson } from '../storage.ts';
+import { logAudit } from '../middleware/audit.ts';
+const r = Router();
+function make(entity:string, file:string){
+  r.get(`/${entity}`, (req,res)=>{ const all=readJson<any[]>(`${file}.json`,[]); const s=req.query.status as string; if(s==='all') return res.json(all.filter(x=>x.status!=='deleted')); if(s==='archived') return res.json(all.filter(x=>x.status==='archived')); res.json(all.filter(x=>x.status!=='active' ? false : true || !x.status || x.status==='active')); });
+  r.post(`/${entity}`, (req,res)=>{ const all=readJson<any[]>(`${file}.json`,[]); const item={id:Date.now().toString(), status:'active', version:1, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), createdBy:'admin', ...req.body}; all.unshift(item); writeJson(`${file}.json`, all); logAudit({entityType:entity, entityId:item.id, action:'create', actorId:'admin', after:item}); res.json(item); });
+  r.put(`/${entity}/:id`, (req,res)=>{ const all=readJson<any[]>(`${file}.json`,[]); const i=all.findIndex(x=>x.id===req.params.id); if(i===-1) return res.status(404).end(); const before={...all[i]}; const after={...before, ...req.body, updatedAt:new Date().toISOString(), version:before.version+1}; all[i]=after; writeJson(`${file}.json`, all); logAudit({entityType:entity, entityId:after.id, action:'update', actorId:'admin', before, after}); res.json(after); });
+  r.post(`/${entity}/:id/archive`, (req,res)=>{ const all=readJson<any[]>(`${file}.json`,[]); const item=all.find(x=>x.id===req.params.id); if(!item) return res.status(404).end(); const before={...item}; item.status='archived'; item.archivedAt=new Date().toISOString(); writeJson(`${file}.json`, all); logAudit({entityType:entity, entityId:item.id, action:'archive', actorId:'admin', before, after:item, reason:req.body.reason}); res.json(item); });
+  r.post(`/${entity}/:id/restore`, (req,res)=>{ const all=readJson<any[]>(`${file}.json`,[]); const item=all.find(x=>x.id===req.params.id); if(!item) return res.status(404).end(); const before={...item}; item.status='active'; delete item.archivedAt; delete item.deletedAt; writeJson(`${file}.json`, all); logAudit({entityType:entity, entityId:item.id, action:'restore', actorId:'admin', before, after:item}); res.json(item); });
+  r.delete(`/${entity}/:id`, (req,res)=>{ if(req.query.confirm!=='PERMANENTLY_DELETE') return res.status(400).json({error:'Add ?confirm=PERMANENTLY_DELETE to confirm'}); const all=readJson<any[]>(`${file}.json`,[]); const item=all.find(x=>x.id===req.params.id); writeJson(`${file}.json`, all.filter(x=>x.id!==req.params.id)); logAudit({entityType:entity, entityId:req.params.id, action:'permanent_delete', actorId:'admin', before:item}); res.json({ok:true}); });
+}
+['clients','premises','enquiries','quotations','jobs','users','documents','sections','questions','audit'].forEach(e=>make(e,e));
+export default r;

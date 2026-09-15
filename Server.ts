@@ -1,0 +1,10 @@
+import express from 'express';
+import cors from 'cors';
+import adminRoutes from './server/routes/admin.ts';
+const app = express();
+app.use(cors());
+app.use(express.json({limit:'20mb'}));
+app.use('/api/admin', adminRoutes);
+app.get('/api/health', (_,res)=>res.json({ok:true, system:'Aurelius Fire - RRFSO Article 9 / PAS 79'}));
+app.listen(3000, ()=>console.log('Aurelius Fire running on 3000'));
+export default app;
