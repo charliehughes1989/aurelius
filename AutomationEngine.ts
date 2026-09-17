@@ -238,7 +238,7 @@ export function runClientAutomation(
 
   const termsSigned = c360.tasks.some((t:any) =>
     String(t.type || '').toLowerCase() === 'terms' &&
-    ['completed','signed','accepted'].includes(String(t.status).toLowerCase())
+    ['completed','complete','signed','accepted'].includes(String(t.status).toLowerCase())
   );
 
   const onboardingComplete = c360.tasks.some((t:any) =>
@@ -246,61 +246,59 @@ export function runClientAutomation(
     ['completed','complete','submitted'].includes(String(t.status).toLowerCase())
   );
 
-  const paidInvoice = c360.invoices.find((i:any) =>
+  const paidInvoice = c360.invoices.some((i:any) =>
     ['paid','succeeded','complete'].includes(String(i.status).toLowerCase())
   );
 
-  const confirmedBooking = c360.bookings.find((b:any) =>
+  const confirmedBooking = c360.bookings.some((b:any) =>
     ['confirmed','booked','scheduled'].includes(String(b.status).toLowerCase())
   );
 
-  const completedAssessment = c360.assessments.find((a:any) =>
+  const completedAssessment = c360.assessments.some((a:any) =>
     ['completed','complete'].includes(String(a.status).toLowerCase())
   );
 
-  const finalReport = c360.documents.find((d:any) =>
-    String(d.type || d.category || '').toLowerCase().includes('report') ||
-    String(d.documentType || '').toLowerCase().includes('fra')
-  );
+  const finalReport = c360.documents.some((d:any) => {
+    const text = String(
+      d.type || d.category || d.documentType || d.name || ''
+    ).toLowerCase();
+    return text.includes('report') || text.includes('fra');
+  });
 
   const openActions = c360.actions.filter((a:any) =>
     !['completed','closed'].includes(String(a.status).toLowerCase())
   );
 
   if (finalReport && completedAssessment && openActions.length === 0 && stage !== 'complete') {
-    return advanceWorkflow(clientId, 'complete', reqActor, 'Report complete and no open actions');
+    return advanceWorkflow(clientId,'complete',reqActor,'Report complete and no open actions');
   }
 
   if (finalReport && stage !== 'actions' && stage !== 'complete') {
-    return advanceWorkflow(clientId, 'actions', reqActor, 'Final report available');
+    return advanceWorkflow(clientId,'actions',reqActor,'Final report available');
   }
 
   if (completedAssessment && !finalReport && stage !== 'report') {
-    return advanceWorkflow(clientId, 'report', reqActor, 'Assessment completed');
+    return advanceWorkflow(clientId,'report',reqActor,'Assessment completed');
   }
 
   if (confirmedBooking && !completedAssessment && stage !== 'assessment') {
-    return advanceWorkflow(clientId, 'assessment', reqActor, 'Booking confirmed');
+    return advanceWorkflow(clientId,'assessment',reqActor,'Booking confirmed');
   }
 
   if (paidInvoice && !['ready_to_book','booked','assessment','report','actions','complete'].includes(stage)) {
-    return advanceWorkflow(clientId, 'ready_to_book', reqActor, 'Payment received');
+    return advanceWorkflow(clientId,'ready_to_book',reqActor,'Payment received');
   }
 
   if (onboardingComplete && !paidInvoice && !['payment','ready_to_book','booked','assessment','report','actions','complete'].includes(stage)) {
-    return advanceWorkflow(clientId, 'payment', reqActor, 'Client onboarding completed; payment required');
+    return advanceWorkflow(clientId,'payment',reqActor,'Onboarding completed; payment required');
   }
 
   if (termsSigned && !onboardingComplete && !['onboarding','payment','ready_to_book','booked','assessment','report','actions','complete'].includes(stage)) {
-    return advanceWorkflow(clientId, 'onboarding', reqActor, 'Terms signed; onboarding required');
-  }
-
-  if (quote && stage === 'accepted') {
-    return advanceWorkflow(clientId, 'terms', reqActor, 'Quote accepted; engagement terms required');
+    return advanceWorkflow(clientId,'onboarding',reqActor,'Terms signed; onboarding required');
   }
 
   if (quote && stage === 'quote') {
-    return advanceWorkflow(clientId, 'accepted', reqActor, 'Quote accepted');
+    return advanceWorkflow(clientId,'accepted',reqActor,'Quote accepted');
   }
 
   return current;
