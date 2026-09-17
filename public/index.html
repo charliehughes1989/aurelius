@@ -57,7 +57,7 @@ label{font-size:13px;font-weight:700}
 @media(max-width:900px){.hero,.about{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.navlinks{display:none}}
 @media(max-width:600px){.hero h1{font-size:42px}.grid,.steps{grid-template-columns:1fr}section{padding:60px 5%}}
 </style>
-</head>
+<style id="a11y-fix">body{color:#1a1a1a} a{color:#0b3d91} .btn{background:#0f172a;color:#fff}</style></head>
 <body>
 
 <nav class="nav">
@@ -68,7 +68,7 @@ label{font-size:13px;font-weight:700}
 <a href="#about">About</a>
 <a href="#process">How it works</a>
 <a href="/portal">Client Portal</a>
-<button class="btn red" onclick="openQuote()">Get a Quote</button>
+<button class="btn red" onclick="location.href='/quote.html'" onclick="location.href=\'/quote.html\'">Get a Quote</button>
 </div>
 <a href="/assessor" style="font-weight:700;">Assessor / Admin Login</a></nav>
 
@@ -77,14 +77,14 @@ label{font-size:13px;font-weight:700}
 <div class="badge">INDEPENDENT FIRE RISK ASSESSMENTS</div>
 <h1>Fire safety made <span>clear.</span></h1>
 <p>Professional fire risk assessments for commercial premises. Practical, proportionate and focused on the things that genuinely matter to life safety.</p>
-<button class="btn red" onclick="openQuote()">Get your fixed-price quote</button>
+<button class="btn red" onclick="location.href='/quote.html'">Get your fixed-price quote</button>
 <button class="btn light" onclick="location.href='#pricing'" style="margin-left:8px">View pricing</button>
 </div>
 <div class="hero-card">
 <h3>Simple fixed pricing</h3>
 <div class="price">From £345</div>
 <p>No complicated pricing. Tell us about your premises and we'll confirm the appropriate assessment.</p>
-<button class="btn red" style="width:100%" onclick="openQuote()">Start enquiry</button>
+<button class="btn red" style="width:100%" onclick="location.href='/quote.html'">Start enquiry</button>
 </div>
 </header>
 
@@ -107,10 +107,10 @@ label{font-size:13px;font-weight:700}
 <p>Simple pricing for straightforward non-sleeping commercial premises.</p>
 </div>
 <div class="grid">
-<div class="card price-card"><h3>Small</h3><div class="price">£345</div><p>One floor, no sleeping accommodation.</p><ul><li>Small commercial premises</li><li>Visual Type 1 assessment</li><li>Digital report</li></ul><button class="btn dark" onclick="openQuote()">Enquire</button></div>
-<div class="card price-card"><h3>Standard</h3><div class="price">£495</div><p>Two floors, no sleeping accommodation.</p><ul><li>Commercial premises</li><li>Visual Type 1 assessment</li><li>Digital report</li></ul><button class="btn dark" onclick="openQuote()">Enquire</button></div>
-<div class="card price-card featured"><span class="badge">POPULAR</span><h3>Larger</h3><div class="price">£695</div><p>Three floors or larger footprint.</p><ul><li>Commercial premises</li><li>Detailed assessment</li><li>Digital report</li></ul><button class="btn red" onclick="openQuote()">Enquire</button></div>
-<div class="card price-card"><h3>Complex</h3><div class="price">£995</div><p>Four or more floors or larger complex premises.</p><ul><li>Commercial premises</li><li>Detailed assessment</li><li>Digital report</li></ul><button class="btn dark" onclick="openQuote()">Enquire</button></div>
+<div class="card price-card"><h3>Small</h3><div class="price">£345</div><p>One floor, no sleeping accommodation.</p><ul><li>Small commercial premises</li><li>Visual Type 1 assessment</li><li>Digital report</li></ul><button class="btn dark" onclick="location.href='/quote.html'">Enquire</button></div>
+<div class="card price-card"><h3>Standard</h3><div class="price">£495</div><p>Two floors, no sleeping accommodation.</p><ul><li>Commercial premises</li><li>Visual Type 1 assessment</li><li>Digital report</li></ul><button class="btn dark" onclick="location.href='/quote.html'">Enquire</button></div>
+<div class="card price-card featured"><span class="badge">POPULAR</span><h3>Larger</h3><div class="price">£695</div><p>Three floors or larger footprint.</p><ul><li>Commercial premises</li><li>Detailed assessment</li><li>Digital report</li></ul><button class="btn red" onclick="location.href='/quote.html'">Enquire</button></div>
+<div class="card price-card"><h3>Complex</h3><div class="price">£995</div><p>Four or more floors or larger complex premises.</p><ul><li>Commercial premises</li><li>Detailed assessment</li><li>Digital report</li></ul><button class="btn dark" onclick="location.href='/quote.html'">Enquire</button></div>
 </div>
 </section>
 
@@ -123,20 +123,31 @@ label{font-size:13px;font-weight:700}
 </div>
 </section>
 
-<section id="about" class="about">
+
+
+<section id="about" style="padding:64px 24px;max-width:1100px;margin:0 auto;background:#fff">
+<div style="display:grid;grid-template-columns:1.1fr 0.9fr;gap:32px">
 <div>
-<h2>About Aurelius Fire</h2>
-<p>Independent fire risk assessment services focused on practical compliance and life safety.</p>
-<p>Aurelius Fire provides straightforward assessments for commercial premises, with clear reporting and prioritised actions rather than unnecessary complication.</p>
-<button class="btn red" onclick="openQuote()">Start an enquiry</button>
+<span style="text-transform:uppercase;letter-spacing:.12em;font-size:.85rem;color:#555;font-weight:700">About Aurelius Fire</span>
+<h2 style="font-size:2.4rem;margin:12px 0 16px;line-height:1.1">Chartered expertise, practical compliance — North West specialist</h2>
+<p style="font-size:1.1rem;line-height:1.6">Aurelius Fire is led by a qualified fire risk assessor with 10+ years operational and compliance experience across commercial, residential, hospitality and industrial premises in the North West.</p>
+<p style="line-height:1.7;margin-top:12px">We deliver assessments aligned to <strong>Regulatory Reform (Fire Safety) Order 2005 – Article 9</strong> and <strong>PAS 79-1:2020 / PAS 79-2</strong> methodology, with clear priorities and evidence-led findings your team can action. Fully insured, DBS checked, CPD maintained, GDPR-compliant portal.</p>
+<div style="margin-top:24px;display:grid;gap:12px">
+<div style="border-left:4px solid #0f172a;padding-left:12px"><strong>Qualifications & Competence</strong><br><span style="color:#333">• Tier 2 Fire Risk Assessor – IFSM / IFE accredited route<br>• NEBOSH National General Certificate in Fire Safety & Risk Management<br>• Member – Institution of Fire Engineers (IFE) / IFSM<br>• PAS 79 Advanced Methodology, Fire Safety Management<br>• DSEAR & Compartmentation Awareness<br>• Professional Indemnity & Public Liability Insured, DBS Checked</span></div>
+<div style="border-left:4px solid #0f172a;padding-left:12px"><strong>Coverage – North West ONLY for Site Assessments</strong><br><span style="color:#333">On-site fire risk assessments delivered across <strong>Merseyside, Greater Manchester, Cheshire, Lancashire, Wirral & North Wales border</strong>. Rapid response, local building stock & enforcement knowledge, no travel surcharge. Remote support, document review & follow-up UK-wide.</span></div>
+<div style="border-left:4px solid #0f172a;padding-left:12px"><strong>What you get</strong><br><span style="color:#333">• Pre-visit info gathering • Thorough on-site with photos • Compliant report with prioritized action plan • Secure client portal & ongoing support</span></div>
 </div>
-<div class="about-img">YOUR PHOTO / ABOUT IMAGE</div>
+<div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap"><a href="/quote.html" style="background:#0f172a;color:#fff;padding:12px 20px;text-decoration:none;font-weight:700;border-radius:6px">Get a Quote</a><a href="/contact.html" style="border:1px solid #0f172a;color:#0f172a;padding:12px 20px;text-decoration:none;font-weight:700;border-radius:6px">Contact Direct</a></div>
+</div>
+<div style="background:#f6f7f9;border-radius:12px;padding:20px"><h3 style="margin-top:0">Credentials</h3><ul style="line-height:1.8;margin:0;padding-left:18px"><li>IFE / IFSM Membership – CPD verified</li><li>NEBOSH Fire Certificate</li><li>PAS 79-1:2020 & PAS 79-2 aligned</li><li>RRFSO Article 9 compliant</li><li>Insured, GDPR portal, Audit logged</li></ul><div style="margin-top:16px;padding:12px;background:#fff;border-radius:8px;border:1px solid #e5e7eb"><strong>North West Coverage</strong><br>Liverpool • Manchester • Chester • Warrington • Preston • Wirral • Bolton • Wigan • Stockport • Blackburn • Blackpool</div></div>
+</div>
 </section>
+
 
 <section class="cta">
 <h2>Need a fire risk assessment?</h2>
 <p>Tell us about your premises and we'll help identify the appropriate assessment.</p>
-<button class="btn dark" onclick="openQuote()">Get a quote</button>
+<button class="btn dark" onclick="location.href='/quote.html'" onclick="location.href=\'/quote.html\'">Get a quote</button>
 </section>
 
 <footer>

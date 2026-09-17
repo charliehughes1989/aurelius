@@ -1,0 +1,6 @@
+{
+  "name": "coach-crm-saas",
+  "version": "2.0.0",
+  "scripts": {"dev": "vite", "build": "vite build", "start": "bun Server.ts"},
+  "dependencies": {"stripe": "latest", "express": "latest", "cors": "latest"}
+}
