@@ -16,24 +16,24 @@ router.get('/quotes', (req, res) => {
 });
 
 router.post('/quotes/:id/send', requireRoles('super_admin', 'admin'), (req, res) => {
-  const quote = getEntity('quotes', req.params.id); if (!quote) return res.status(404).json({ error: 'Quote not found' });
+  const quote = getEntity('quotes', String(req.params.id)); if (!quote) return res.status(404).json({ error: 'Quote not found' });
   const updated = saveEntity('quotes', { ...quote, status: 'sent', sentAt: new Date().toISOString(), version: (quote.version ?? 1) + 1 }, (req as any).user, 'quote_sent');
   enqueueNotification('quote_sent', quote.email, { quoteId: quote.id, quoteNumber: quote.quoteNumber });
   res.json(updated);
 });
 router.post('/quotes/:id/cancel', requireRoles('super_admin', 'admin'), (req, res) => {
-  const quote = getEntity('quotes', req.params.id); if (!quote) return res.status(404).json({ error: 'Quote not found' });
+  const quote = getEntity('quotes', String(req.params.id)); if (!quote) return res.status(404).json({ error: 'Quote not found' });
   res.json(saveEntity('quotes', { ...quote, status: 'cancelled', cancelledAt: new Date().toISOString(), version: (quote.version ?? 1) + 1 }, (req as any).user, 'quote_cancelled'));
 });
 
 router.post('/bookings/:id/cancel', requireRoles('super_admin', 'admin'), (req, res) => {
-  const booking = getEntity('bookings', req.params.id); if (!booking) return res.status(404).json({ error: 'Booking not found' });
+  const booking = getEntity('bookings', String(req.params.id)); if (!booking) return res.status(404).json({ error: 'Booking not found' });
   const slot = getEntity('booking_slots', booking.slotId); if (slot) saveEntity('booking_slots', { ...slot, available: true }, (req as any).user, 'slot_released');
   res.json(saveEntity('bookings', { ...booking, status: 'cancelled', cancelledAt: new Date().toISOString() }, (req as any).user, 'booking_cancelled'));
 });
 
 router.post('/bookings/:id/reschedule', requireRoles('super_admin', 'admin'), (req, res) => {
-  const booking = getEntity('bookings', req.params.id); if (!booking) return res.status(404).json({ error: 'Booking not found' });
+  const booking = getEntity('bookings', String(req.params.id)); if (!booking) return res.status(404).json({ error: 'Booking not found' });
   const nextSlot = getEntity('booking_slots', req.body?.slotId); if (!nextSlot || !nextSlot.available) return res.status(409).json({ error: 'New slot is unavailable' });
   const conflict = listEntities('bookings', undefined, 'all').find((item) => item.id !== booking.id && item.slotId === nextSlot.id && !['cancelled', 'no-show'].includes(item.status));
   if (conflict) return res.status(409).json({ error: 'New slot is already booked' });
@@ -48,7 +48,7 @@ router.post('/bookings/:id/reschedule', requireRoles('super_admin', 'admin'), (r
 });
 
 router.post('/messages/:id/read', requireRoles('super_admin', 'admin', 'assessor'), (req, res) => {
-  const message = getEntity('messages', req.params.id); if (!message) return res.status(404).json({ error: 'Message not found' });
+  const message = getEntity('messages', String(req.params.id)); if (!message) return res.status(404).json({ error: 'Message not found' });
   res.json(saveEntity('messages', { ...message, readAt: new Date().toISOString(), readBy: (req as any).user.id }, (req as any).user, 'message_read'));
 });
 
@@ -65,7 +65,7 @@ router.post('/documents/upload', requireRoles('super_admin', 'admin', 'assessor'
   res.status(201).json(saveEntity('documents', { clientId, entityId, fileName, mimeType, sizeBytes: buffer.length, storageName, category: category ?? 'other', portalVisible: portalVisible !== false, uploadedBy: (req as any).user.id }, (req as any).user, 'document_upload'));
 });
 router.get('/documents/:id/download', (req, res) => {
-  const document = getEntity('documents', req.params.id);
+  const document = getEntity('documents', String(req.params.id));
   if (!document) return res.status(404).json({ error: 'Document not found' });
   writeAudit({ actorId: (req as any).user.id, actorRole: (req as any).user.role, action: 'document_download', entityType: 'document', entityId: document.id });
   res.download(path.join(process.cwd(), 'data', 'uploads', document.storageName), document.fileName);
@@ -84,6 +84,7 @@ router.post('/booking_slots', requireRoles('super_admin', 'admin'), (req, res) =
 router.post('/users', requireRoles('super_admin', 'admin'), (req, res) => {
   const { email, password, role, displayName, clientId } = req.body ?? {};
   if (!email || !password || !role || !displayName) return res.status(400).json({ error: 'email, password, role, and displayName are required' });
+  if (db.query('SELECT id FROM users WHERE email=?').get(String(email).toLowerCase().trim())) return res.status(409).json({ error: 'A user with this email already exists' });
   if (!['super_admin', 'admin', 'assessor', 'qa_reviewer', 'client_contact'].includes(role)) return res.status(400).json({ error: 'Invalid role' });
   if (role === 'client_contact' && !clientId) return res.status(400).json({ error: 'Client users require clientId' });
   res.status(201).json(createUser(email, password, role, displayName, clientId ?? null));
@@ -135,24 +136,24 @@ for (const name of entityNames) {
     res.status(201).json(saveEntity(type, { ...req.body, createdBy: (req as any).user.id }, (req as any).user, 'create'));
   });
   router.put(`/${name}/:id`, (req, res) => {
-    const current = getEntity(type, req.params.id);
+    const current = getEntity(type, String(req.params.id));
     if (!current) return res.status(404).json({ error: 'Record not found' });
     if ((req as any).user.role === 'assessor' && current.assessorId && current.assessorId !== (req as any).user.id) return res.status(403).json({ error: 'Record is assigned to another assessor' });
     res.json(saveEntity(type, { ...current, ...req.body, id: current.id, version: (current.version ?? 1) + 1 }, (req as any).user, 'update'));
   });
   router.post(`/${name}/:id/archive`, (req, res) => {
-    const current = getEntity(type, req.params.id); if (!current) return res.status(404).json({ error: 'Record not found' });
+    const current = getEntity(type, String(req.params.id)); if (!current) return res.status(404).json({ error: 'Record not found' });
     res.json(saveEntity(type, { ...current, status: 'archived', archivedAt: new Date().toISOString() }, (req as any).user, 'archive'));
   });
   router.post(`/${name}/:id/restore`, (req, res) => {
-    const current = getEntity(type, req.params.id); if (!current) return res.status(404).json({ error: 'Record not found' });
+    const current = getEntity(type, String(req.params.id)); if (!current) return res.status(404).json({ error: 'Record not found' });
     res.json(saveEntity(type, { ...current, status: 'active', archivedAt: null }, (req as any).user, 'restore'));
   });
   router.delete(`/${name}/:id`, requireRoles('super_admin', 'admin'), (req, res) => {
     if (req.query.confirm !== 'PERMANENTLY_DELETE') return res.status(400).json({ error: 'Explicit confirmation required' });
-    const current = getEntity(type, req.params.id); if (!current) return res.status(404).json({ error: 'Record not found' });
-    db.query('DELETE FROM entities WHERE type=? AND id=?').run(type, req.params.id);
-    writeAudit({ actorId: (req as any).user.id, actorRole: (req as any).user.role, action: 'permanent_delete', entityType: type, entityId: req.params.id, before: current });
+    const current = getEntity(type, String(req.params.id)); if (!current) return res.status(404).json({ error: 'Record not found' });
+    db.query('DELETE FROM entities WHERE type=? AND id=?').run(type, String(req.params.id));
+    writeAudit({ actorId: (req as any).user.id, actorRole: (req as any).user.role, action: 'permanent_delete', entityType: type, entityId: String(req.params.id), before: current });
     res.json({ ok: true });
   });
 }

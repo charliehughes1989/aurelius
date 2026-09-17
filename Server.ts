@@ -24,7 +24,7 @@ app.use((req, _res, next) => {
   next();
 });
 app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), (req, res) => {
-  try { handleStripeWebhook(req.body as Buffer, req.headers['stripe-signature']); res.json({ received: true }); }
+  try { handleStripeWebhook(req.body as Buffer, (Array.isArray(req.headers['stripe-signature']) ? req.headers['stripe-signature'][0] : req.headers['stripe-signature'])); res.json({ received: true }); }
   catch (error) { res.status(400).json({ error: error instanceof Error ? error.message : 'Invalid webhook' }); }
 });
 app.use(express.json({ limit: '25mb' }));
@@ -63,10 +63,13 @@ app.post('/api/public/quotes', (req, res) => {
   const required = ['customerName', 'companyName', 'email', 'telephone', 'premisesAddress', 'postcode', 'premisesType', 'floors', 'approximateSize', 'occupancyInformation'];
   if (required.some((field) => body[field] === undefined || body[field] === '')) return res.status(400).json({ error: 'All required premises and contact fields must be completed' });
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(body.email)) return res.status(400).json({ error: 'A valid email address is required' });
-  const packages = listEntities('pricing', undefined, 'active');
-  const selected = packages.sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).find((item) => Number(body.floors) <= Number(item.maxFloors ?? Number.MAX_SAFE_INTEGER) && Number(body.approximateSize) <= Number(item.maxSize ?? Number.MAX_SAFE_INTEGER)) ?? { key: 'standard', name: 'Standard', price: 495 };
+  const packages = listEntities('pricing', undefined, 'active').sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const defaultRules: Record<string, { maxFloors: number; maxSize: number }> = { small: { maxFloors: 1, maxSize: 150 }, standard: { maxFloors: 2, maxSize: 300 }, larger: { maxFloors: 4, maxSize: 750 }, complex: { maxFloors: Number.MAX_SAFE_INTEGER, maxSize: Number.MAX_SAFE_INTEGER } };
+  const selected = packages.find((item) => { const rule = defaultRules[item.key] ?? { maxFloors: Number.MAX_SAFE_INTEGER, maxSize: Number.MAX_SAFE_INTEGER }; return Number(body.floors) <= Number(item.maxFloors ?? rule.maxFloors) && Number(body.approximateSize) <= Number(item.maxSize ?? rule.maxSize); }) ?? packages.at(-1) ?? { key: 'standard', name: 'Standard', price: 495 };
   const client = saveEntity('clients', { legalName: body.companyName, responsiblePerson: body.customerName, email: body.email, telephone: body.telephone, registeredAddress: { line1: body.premisesAddress, postcode: body.postcode }, source: 'website' });
-  const quote = saveEntity('quotes', { clientId: client.id, quoteNumber: `AF-Q-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`, customerName: body.customerName, companyName: body.companyName, email: body.email, premises: { address: body.premisesAddress, postcode: body.postcode, type: body.premisesType, floors: Number(body.floors), approximateSize: Number(body.approximateSize), occupancyInformation: body.occupancyInformation, sleepingAccommodation }, packageKey: selected.key, packageName: selected.name, total: Number(selected.price), status: 'draft', expiresAt: new Date(Date.now() + 14 * 86400000).toISOString(), termsVersion: 'current', publicToken: crypto.randomBytes(32).toString('hex') });
+  const premises = saveEntity('premises', { clientId: client.id, name: `${body.companyName} premises`, address: body.premisesAddress, postcode: body.postcode, premisesType: body.premisesType, floors: Number(body.floors), approximateSize: Number(body.approximateSize), occupancyInformation: body.occupancyInformation, sleepingAccommodation });
+  const enquiry = saveEntity('enquiries', { clientId: client.id, premisesId: premises.id, customerName: body.customerName, companyName: body.companyName, email: body.email, telephone: body.telephone, status: 'active', source: 'website', service: 'fire risk assessment', additionalInformation: body.additionalInformation });
+  const quote = saveEntity('quotes', { clientId: client.id, premisesId: premises.id, enquiryId: enquiry.id, quoteNumber: `AF-Q-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`, customerName: body.customerName, companyName: body.companyName, email: body.email, premises: { address: body.premisesAddress, postcode: body.postcode, type: body.premisesType, floors: Number(body.floors), approximateSize: Number(body.approximateSize), occupancyInformation: body.occupancyInformation, sleepingAccommodation }, packageKey: selected.key, packageName: selected.name, total: Number(selected.price), status: 'draft', expiresAt: new Date(Date.now() + 14 * 86400000).toISOString(), termsVersion: 'current', publicToken: crypto.randomBytes(32).toString('hex') });
   enqueueNotification('quote_created', body.email, { quoteId: quote.id, quoteNumber: quote.quoteNumber });
   res.status(201).json({ id: quote.id, quoteNumber: quote.quoteNumber, estimatedPrice: quote.total, status: quote.status, quoteToken: quote.publicToken });
 });
@@ -225,6 +228,8 @@ migrateLegacyClients();
 function ensureConfiguredRecords() {
   const pricing = [{ key: 'small', name: 'Small', price: 345, description: 'Suitable smaller premises assessment.', criteria: '', order: 1 }, { key: 'standard', name: 'Standard', price: 495, description: 'Standard commercial premises assessment.', criteria: '', order: 2 }, { key: 'larger', name: 'Larger', price: 695, description: 'Assessment for larger premises.', criteria: '', order: 3 }, { key: 'complex', name: 'Complex', price: 995, description: 'Assessment for complex premises.', criteria: '', order: 4 }];
   if (!listEntities('pricing', undefined, 'all').length) for (const packageRecord of pricing) saveEntity('pricing', packageRecord, undefined, 'configuration_seed');
+  const services = [{ name: 'Fire risk assessments', description: 'Structured assessments aligned with RRFSO Article 9 and PAS 79 principles.', order: 1 }, { name: 'Practical compliance support', description: 'Clear priorities, evidence-led findings, and actions your team can understand.', order: 2 }, { name: 'Follow-up support', description: 'Document exchange, review support, and secure client portal access.', order: 3 }];
+  if (!listEntities('services', undefined, 'all').length) for (const service of services) saveEntity('services', service, undefined, 'configuration_seed');
   const policies = { terms: 'Engagement terms will be confirmed before work begins.', privacy: 'Aurelius Fire uses submitted information to respond to enquiries and deliver services.', cookies: 'This website uses only the cookies required for secure sessions and essential operation.' };
   for (const [key, value] of Object.entries(policies)) if (!db.query('SELECT key FROM content WHERE key=?').get(key)) db.query('INSERT INTO content (key,value_json,published,updated_at) VALUES (?,?,1,?)').run(key, JSON.stringify(value), now());
 }
