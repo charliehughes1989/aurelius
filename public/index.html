@@ -59,90 +59,7 @@ label{font-size:13px;font-weight:700}
 </style>
 </head>
 <body>
-<!-- AURELIUS ADMIN LOGIN -->
-<div id="aurelius-admin-login"
-     style="
-       position:fixed;
-       top:18px;
-       right:18px;
-       z-index:2147483647;
-       display:flex;
-       align-items:center;
-       gap:10px;
-       background:#ffffff;
-       border:1px solid #dfe5ed;
-       border-radius:12px;
-       padding:7px;
-       box-shadow:0 8px 30px rgba(0,0,0,.14);
-     ">
-  <span style="
-    font-size:11px;
-    font-weight:700;
-    color:#667085;
-    padding-left:7px;
-    white-space:nowrap;
-  ">Aurelius Team</span>
 
-  <a href="/assessor"
-     style="
-       display:inline-flex;
-       align-items:center;
-       justify-content:center;
-       background:#172033;
-       color:#ffffff;
-       text-decoration:none;
-       border-radius:8px;
-       padding:10px 15px;
-       font-family:Arial,sans-serif;
-       font-size:12px;
-       line-height:1;
-       font-weight:800;
-       white-space:nowrap;
-     ">
-     Assessor / Admin Login
-  </a>
-</div>
-
-
-<nav class="nav">
-<div class="logo">AURELIUS <span>FIRE</span></div>
-<div class="navlinks">
-<a href="#services">Services</a>
-<a href="#pricing">Pricing</a>
-<a href="#about">About</a>
-<a href="#process">How it works</a>
-<a href="/portal">Client Portal</a>
-<button class="btn red" onclick="openQuote()">Get a Quote</button>
-</div>
-</nav>
-
-<header class="hero">
-<div>
-<div class="badge">INDEPENDENT FIRE RISK ASSESSMENTS</div>
-<h1>Fire safety made <span>clear.</span></h1>
-<p>Professional fire risk assessments for commercial premises. Practical, proportionate and focused on the things that genuinely matter to life safety.</p>
-<button class="btn red" onclick="openQuote()">Get your fixed-price quote</button>
-<button class="btn light" onclick="location.href='#pricing'" style="margin-left:8px">View pricing</button>
-</div>
-<div class="hero-card">
-<h3>Simple fixed pricing</h3>
-<div class="price">From £345</div>
-<p>No complicated pricing. Tell us about your premises and we'll confirm the appropriate assessment.</p>
-<button class="btn red" style="width:100%" onclick="openQuote()">Start enquiry</button>
-</div>
-</header>
-
-<section id="services">
-<div class="section-head">
-<h2>Fire risk assessments without the waffle.</h2>
-<p>Designed for businesses that need a competent, practical assessment and a clear action plan.</p>
-</div>
-<div class="grid">
-<div class="card"><h3>Commercial FRAs</h3><p>Life-safety focused assessments for shops, offices, salons, gyms, units and other commercial premises.</p></div>
-<div class="card"><h3>Type 1</h3><p>Non-intrusive visual assessment of accessible areas, with clear limitations and recommendations.</p></div>
-<div class="card"><h3>Reviews</h3><p>Existing assessments reviewed where circumstances, premises or arrangements have changed.</p></div>
-<div class="card"><h3>Action Plans</h3><p>Clear prioritised actions so responsible persons know what needs addressing and when.</p></div>
-</div>
 </section>
 
 <section id="pricing" style="background:#f7f8fa">
@@ -226,5 +143,24 @@ document.getElementById('quoteResult').innerHTML='<p>Thank you. Your enquiry has
 }
 };
 </script>
+
+<a href="/assessor"
+   class="aurelius-admin-link"
+   style="
+     display:inline-flex;
+     align-items:center;
+     justify-content:center;
+     padding:10px 14px;
+     margin-left:8px;
+     border-radius:8px;
+     background:#172033;
+     color:#fff;
+     text-decoration:none;
+     font-size:12px;
+     font-weight:800;
+     white-space:nowrap;
+   ">
+   Assessor Login
+</a>
 </body>
 </html>

@@ -1,224 +1,245 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Aurelius Fire Risk | Assessor Login</title>
-<meta name="description" content="Aurelius Fire Risk assessor and administration portal.">
+<title>Aurelius Fire | Assessor Login</title>
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#f5f7fa;color:#172033}
-body{display:flex;align-items:center;justify-content:center;padding:24px}
-.login-wrap{width:100%;max-width:460px}
-.brand{text-align:center;margin-bottom:28px}
-.brand-mark{width:64px;height:64px;margin:0 auto 16px;border-radius:18px;background:#c62828;color:#fff;display:flex;align-items:center;justify-content:center;font-size:27px;font-weight:800;box-shadow:0 10px 30px rgba(198,40,40,.2)}
-.brand h1{margin:0;font-size:28px;letter-spacing:-.7px}
-.brand p{margin:8px 0 0;color:#687386;font-size:14px}
-.card{background:#fff;border:1px solid #e2e7ee;border-radius:20px;padding:32px;box-shadow:0 18px 55px rgba(20,35,60,.08)}
-.card h2{margin:0 0 7px;font-size:22px}
-.card .intro{margin:0 0 24px;color:#687386;font-size:14px;line-height:1.5}
-label{display:block;font-size:13px;font-weight:700;margin:0 0 7px}
-.field{margin-bottom:18px}
-input{width:100%;height:48px;border:1px solid #d7dde6;border-radius:10px;padding:0 14px;font-size:15px;outline:none;background:#fff}
-input:focus{border-color:#155eef;box-shadow:0 0 0 3px rgba(21,94,239,.1)}
-button{width:100%;height:50px;border:0;border-radius:10px;background:#155eef;color:#fff;font-size:15px;font-weight:750;cursor:pointer}
-button:hover{background:#0d4fc7}
-button:disabled{opacity:.65;cursor:wait}
-.notice{display:none;padding:12px 14px;border-radius:10px;margin-bottom:18px;font-size:14px;line-height:1.4}
-.notice.error{display:block;background:#fff0f0;color:#a61b1b;border:1px solid #f1c4c4}
-.notice.success{display:block;background:#effaf2;color:#176b2c;border:1px solid #bfe3c7}
-.footer{text-align:center;margin-top:20px;color:#7a8494;font-size:12px}
-.footer a{color:#155eef;text-decoration:none}
-.setup{display:none;margin-top:25px;padding-top:22px;border-top:1px solid #e8ebf0}
-.setup h3{margin:0 0 7px;font-size:16px}
-.setup p{margin:0 0 15px;color:#687386;font-size:13px;line-height:1.45}
-.secondary{background:#fff;color:#155eef;border:1px solid #cfd8e6;margin-top:10px}
-.secondary:hover{background:#f4f7fb}
-.small{font-size:12px;color:#7a8494;margin-top:12px;line-height:1.45}
+html,body{margin:0;min-height:100%;font-family:Inter,Arial,sans-serif}
+body{background:#f5f7fa;color:#172033;display:flex;align-items:center;justify-content:center;padding:25px}
+.card{width:100%;max-width:430px;background:#fff;border:1px solid #e2e7ee;border-radius:16px;padding:32px;box-shadow:0 15px 50px rgba(20,30,45,.10)}
+.logo{text-align:center;font-size:21px;font-weight:900;letter-spacing:.3px}
+.logo span{color:#c91f2b}
+.subtitle{text-align:center;color:#667085;font-size:13px;margin:7px 0 28px}
+label{display:block;font-size:12px;font-weight:800;margin:15px 0 6px}
+input{display:block;width:100%;padding:12px 13px;border:1px solid #d8dee7;border-radius:8px;font-size:14px;outline:none}
+input:focus{border-color:#315ea8;box-shadow:0 0 0 3px rgba(49,94,168,.10)}
+button{width:100%;border:0;border-radius:8px;padding:13px;margin-top:18px;background:#172033;color:white;font-size:13px;font-weight:800;cursor:pointer}
+button:hover{opacity:.94}
+.message{display:none;margin-top:15px;padding:11px;border-radius:8px;font-size:12px;line-height:1.4}
+.back{display:block;text-align:center;margin-top:18px;color:#667085;text-decoration:none;font-size:12px}
+.setup{display:none}
 </style>
 </head>
+
 <body>
 
-<div class="login-wrap">
+<div class="card">
 
-  <div class="brand">
-    <div class="brand-mark">A</div>
-    <h1>Aurelius Fire Risk</h1>
-    <p>Assessor & Administration Portal</p>
-  </div>
+<div class="logo">AURELIUS <span>FIRE</span></div>
+<div class="subtitle">Assessor & Administration Portal</div>
 
-  <div class="card">
+<section id="loginSection">
 
-    <h2>Assessor login</h2>
-    <p class="intro">Sign in to manage clients, premises, enquiries, assessments, documents, bookings, payments and website content.</p>
+<label for="email">Email</label>
+<input id="email" type="email" autocomplete="username">
 
-    <div id="notice" class="notice"></div>
+<label for="password">Password</label>
+<input id="password" type="password" autocomplete="current-password">
 
-    <form id="loginForm">
+<button id="loginButton" onclick="login()">Sign In</button>
 
-      <div class="field">
-        <label for="email">Email address</label>
-        <input id="email" type="email" autocomplete="username" required placeholder="you@example.com">
-      </div>
+<div id="loginMessage" class="message"></div>
 
-      <div class="field">
-        <label for="password">Password</label>
-        <input id="password" type="password" autocomplete="current-password" required placeholder="Enter your password">
-      </div>
+<a class="back" href="/">← Back to Aurelius Fire website</a>
 
-      <button id="loginButton" type="submit">Sign in to Assessor Portal</button>
+</section>
 
-    </form>
+<section id="setupSection" class="setup">
 
-    <div id="setup" class="setup">
-      <h3>First-time setup</h3>
-      <p>No administrator account has been configured yet. Create the initial administrator account below.</p>
+<h3 style="margin:0 0 7px">Create Administrator</h3>
 
-      <form id="setupForm">
+<p style="font-size:12px;color:#667085;line-height:1.5">
+Create the first administrator account for the Aurelius portal.
+</p>
 
-        <div class="field">
-          <label for="setupName">Your name</label>
-          <input id="setupName" required placeholder="Charlie Hughes">
-        </div>
+<label>Name</label>
+<input id="setupName" type="text">
 
-        <div class="field">
-          <label for="setupEmail">Administrator email</label>
-          <input id="setupEmail" type="email" required placeholder="you@example.com">
-        </div>
+<label>Email</label>
+<input id="setupEmail" type="email">
 
-        <div class="field">
-          <label for="setupPassword">Administrator password</label>
-          <input id="setupPassword" type="password" minlength="8" required placeholder="Minimum 8 characters">
-        </div>
+<label>Password</label>
+<input id="setupPassword" type="password">
 
-        <button type="submit">Create Administrator</button>
+<button onclick="setup()">Create Administrator</button>
 
-      </form>
-    </div>
+<div id="setupMessage" class="message"></div>
 
-    <p class="small">
-      Authorised Aurelius Fire Risk assessors and administrators only.
-    </p>
+<button onclick="showLogin()" style="background:#eef1f5;color:#172033">
+Back to Login
+</button>
 
-  </div>
-
-  <div class="footer">
-    <a href="/">← Return to Aurelius Fire Risk website</a>
-  </div>
+</section>
 
 </div>
 
 <script>
-const notice = document.getElementById('notice');
+async function jsonFetch(url,options={}){
+ const response=await fetch(url,{
+   credentials:'same-origin',
+   headers:{'Content-Type':'application/json'},
+   ...options
+ });
 
-function showNotice(message,type='error'){
-  notice.textContent=message;
-  notice.className='notice '+type;
+ let data={};
+
+ try{
+   data=await response.json();
+ }catch(e){}
+
+ return {response,data};
 }
 
-async function checkExistingSession(){
-  try{
-    const r=await fetch('/api/auth/me',{credentials:'include'});
-    if(r.ok){
-      const data=await r.json();
-      if(data && data.user){
-        const role=data.user.role;
-        if(['super_admin','assessor','admin'].includes(role)){
-          window.location.href='/admin';
-        }
-      }
-    }
-  }catch(e){}
+function showMessage(id,text,good=false){
+ const el=document.getElementById(id);
+ el.style.display='block';
+ el.textContent=text;
+ el.style.background=good?'#edf8f0':'#fff0f0';
+ el.style.color=good?'#23643a':'#a61b2b';
 }
 
-async function checkSetup(){
-  try{
-    const r=await fetch('/api/auth/status',{credentials:'include'});
-    if(r.ok){
-      const data=await r.json();
-      if(data && data.setupRequired){
-        document.getElementById('setup').style.display='block';
-      }
-    }
-  }catch(e){}
+async function checkExistingLogin(){
+ try{
+   const {response,data}=await jsonFetch('/api/auth/me');
+
+   if(response.ok && data.user){
+     const role=data.user.role;
+
+     if(['super_admin','admin','assessor'].includes(role)){
+       window.location.replace('/admin');
+       return;
+     }
+   }
+ }catch(e){}
+
+ try{
+   const {response,data}=await jsonFetch('/api/auth/status');
+
+   if(response.ok && (data.setupRequired || data.needsSetup)){
+     document.getElementById('loginSection').style.display='none';
+     document.getElementById('setupSection').style.display='block';
+   }
+ }catch(e){}
 }
 
-document.getElementById('loginForm').addEventListener('submit',async e=>{
-  e.preventDefault();
+async function login(){
 
-  const button=document.getElementById('loginButton');
-  button.disabled=true;
-  button.textContent='Signing in…';
-  showNotice('');
+ const email=document.getElementById('email').value.trim();
+ const password=document.getElementById('password').value;
+ const button=document.getElementById('loginButton');
 
-  try{
-    const r=await fetch('/api/auth/login',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      credentials:'include',
-      body:JSON.stringify({
-        email:document.getElementById('email').value.trim(),
-        password:document.getElementById('password').value
-      })
-    });
+ if(!email || !password){
+   showMessage('loginMessage','Please enter your email and password.');
+   return;
+ }
 
-    const data=await r.json().catch(()=>({}));
+ button.disabled=true;
+ button.textContent='Signing in...';
 
-    if(!r.ok){
-      throw new Error(data.error || 'Invalid email or password.');
-    }
+ try{
 
-    const role=data.user && data.user.role;
+   const {response,data}=await jsonFetch('/api/auth/login',{
+     method:'POST',
+     body:JSON.stringify({email,password})
+   });
 
-    if(!['super_admin','assessor','admin'].includes(role)){
-      await fetch('/api/auth/logout',{method:'POST',credentials:'include'});
-      throw new Error('This account does not have assessor portal access.');
-    }
+   if(!response.ok){
+     showMessage(
+       'loginMessage',
+       data.error || data.message || 'Incorrect email or password.'
+     );
+     button.disabled=false;
+     button.textContent='Sign In';
+     return;
+   }
 
-    showNotice('Login successful. Opening assessor portal…','success');
-    setTimeout(()=>window.location.href='/admin',250);
+   if(!data.user || !['super_admin','admin','assessor'].includes(data.user.role)){
+     showMessage(
+       'loginMessage',
+       'This account does not have assessor or administrator access.'
+     );
+     button.disabled=false;
+     button.textContent='Sign In';
+     return;
+   }
 
-  }catch(error){
-    showNotice(error.message || 'Unable to sign in.');
-    button.disabled=false;
-    button.textContent='Sign in to Assessor Portal';
-  }
+   window.location.replace('/admin');
+
+ }catch(error){
+
+   showMessage(
+     'loginMessage',
+     'The server could not be reached. Make sure the Aurelius server is running.'
+   );
+
+   button.disabled=false;
+   button.textContent='Sign In';
+ }
+}
+
+async function setup(){
+
+ const name=document.getElementById('setupName').value.trim();
+ const email=document.getElementById('setupEmail').value.trim();
+ const password=document.getElementById('setupPassword').value;
+
+ if(!name || !email || !password){
+   showMessage('setupMessage','Please complete all fields.');
+   return;
+ }
+
+ try{
+
+   const {response,data}=await jsonFetch('/api/auth/setup',{
+     method:'POST',
+     body:JSON.stringify({
+       name,
+       displayName:name,
+       email,
+       password
+     })
+   });
+
+   if(!response.ok){
+     showMessage(
+       'setupMessage',
+       data.error || data.message || 'Administrator setup failed.'
+     );
+     return;
+   }
+
+   showMessage(
+     'setupMessage',
+     'Administrator created. You can now sign in.',
+     true
+   );
+
+   setTimeout(()=>{
+     document.getElementById('setupSection').style.display='none';
+     document.getElementById('loginSection').style.display='block';
+     document.getElementById('email').value=email;
+   },700);
+
+ }catch(error){
+   showMessage(
+     'setupMessage',
+     'The server could not be reached.'
+   );
+ }
+}
+
+function showLogin(){
+ document.getElementById('setupSection').style.display='none';
+ document.getElementById('loginSection').style.display='block';
+}
+
+document.getElementById('password').addEventListener('keydown',event=>{
+ if(event.key==='Enter') login();
 });
 
-document.getElementById('setupForm').addEventListener('submit',async e=>{
-  e.preventDefault();
-
-  try{
-    const r=await fetch('/api/auth/setup',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      credentials:'include',
-      body:JSON.stringify({
-        email:document.getElementById('setupEmail').value.trim(),
-        password:document.getElementById('setupPassword').value,
-        displayName:document.getElementById('setupName').value.trim()
-      })
-    });
-
-    const data=await r.json().catch(()=>({}));
-
-    if(!r.ok){
-      throw new Error(data.error || 'Unable to create administrator.');
-    }
-
-    showNotice('Administrator created. You can now sign in.','success');
-    document.getElementById('setup').style.display='none';
-    document.getElementById('email').value=document.getElementById('setupEmail').value;
-    document.getElementById('password').value='';
-    document.getElementById('password').focus();
-
-  }catch(error){
-    showNotice(error.message || 'Unable to create administrator.');
-  }
-});
-
-checkExistingSession();
-checkSetup();
+checkExistingLogin();
 </script>
 
 </body>
