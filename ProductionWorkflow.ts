@@ -7,16 +7,11 @@ import {
   now,
   enqueueNotification
 } from './database.ts';
-import { currentUser } from './auth.ts';
 
 const router = Router();
 
 function actor(req: any) {
-  try {
-    return currentUser(req) || {};
-  } catch {
-    return {};
-  }
+  return req?.user || {};
 }
 
 function id(prefix: string) {
@@ -318,22 +313,20 @@ router.post('/quote/:quoteId/accept', (req, res) => {
     saveEntity(
       'invoice',
       invoice,
-      actor(req)?.id || null,
+      actor(req),
       'invoice_created'
     );
   }
 
   if (clientId) {
-    enqueueNotification({
-      type: 'quote_accepted',
-      recipient_id: clientId,
-      entity_type: 'quote',
-      entity_id: quoteId,
-      payload: {
+    enqueueNotification(
+      'quote_accepted',
+      clientId || undefined,
+      {
         quoteId,
         invoiceId: invoice.id
       }
-    });
+    );
   }
 
   res.json({
@@ -376,11 +369,11 @@ router.post('/client/:clientId/terms/assign', (req, res) => {
   };
 
   saveEntity(
-    'terms_assignment',
-    record,
-    actor(req)?.id || null,
-    'terms_assigned'
-  );
+      'terms_assignment',
+      record,
+      actor(req),
+      'terms_assigned'
+    );
 
   res.json({ ok: true, terms: parseEntity(record) });
 });
@@ -406,11 +399,11 @@ router.post('/client/:clientId/terms/sign', (req, res) => {
   };
 
   saveEntity(
-    'terms_signature',
-    signature,
-    actor(req)?.id || null,
-    'terms_signed'
-  );
+      'terms_signature',
+      signature,
+      actor(req),
+      'terms_signed'
+    );
 
   res.json({ ok: true, signature: parseEntity(signature) });
 });
@@ -435,11 +428,11 @@ router.post('/client/:clientId/onboarding/complete', (req, res) => {
   };
 
   saveEntity(
-    'onboarding',
-    record,
-    actor(req)?.id || null,
-    'onboarding_completed'
-  );
+      'onboarding',
+      record,
+      actor(req),
+      'onboarding_completed'
+    );
 
   res.json({ ok: true, onboarding: parseEntity(record) });
 });
@@ -554,19 +547,17 @@ router.post('/client/:clientId/book', (req, res) => {
   };
 
   saveEntity(
-    'booking',
-    booking,
-    actor(req)?.id || null,
-    'booking_created'
-  );
+      'booking',
+      booking,
+      actor(req),
+      'booking_created'
+    );
 
-  enqueueNotification({
-    type: 'booking_confirmed',
-    recipient_id: clientId,
-    entity_type: 'booking',
-    entity_id: booking.id,
-    payload: parseEntity(booking)
-  });
+  enqueueNotification(
+    'booking_confirmed',
+    clientId || undefined,
+    parseEntity(booking)
+  );
 
   res.json({
     ok: true,
@@ -625,11 +616,11 @@ router.post('/invoice/:invoiceId/mark-paid', (req, res) => {
   };
 
   saveEntity(
-    'payment',
-    payment,
-    actor(req)?.id || null,
-    'payment_recorded'
-  );
+      'payment',
+      payment,
+      actor(req),
+      'payment_recorded'
+    );
 
   res.json({
     ok: true,
@@ -671,11 +662,11 @@ router.post('/client/:clientId/final-report', (req, res) => {
   };
 
   saveEntity(
-    'document',
-    document,
-    actor(req)?.id || null,
-    'final_report_uploaded'
-  );
+      'document',
+      document,
+      actor(req),
+      'final_report_uploaded'
+    );
 
   res.json({
     ok: true,
@@ -724,11 +715,11 @@ router.post('/client/:clientId/action', (req, res) => {
   };
 
   saveEntity(
-    'action',
-    action,
-    actor(req)?.id || null,
-    'action_created'
-  );
+      'action',
+      action,
+      actor(req),
+      'action_created'
+    );
 
   res.json({ ok: true, action: parseEntity(action) });
 });
@@ -804,11 +795,11 @@ router.post('/client/:clientId/message', (req, res) => {
   };
 
   saveEntity(
-    'message',
-    message,
-    actor(req)?.id || null,
-    'message_sent'
-  );
+      'message',
+      message,
+      actor(req),
+      'message_sent'
+    );
 
   res.json({
     ok: true,
