@@ -15,6 +15,7 @@ import onboardingAutomation from './OnboardingAutomation.ts';
 import fileUploads from './FileUploads.ts';
 import stripeCheckout from './StripeCheckout.ts';
 import aiWebsite from './AIWebsite.ts';
+import aiControl from './AIControl.ts';
 
 const app = express();
 const publicDir = path.join(process.cwd(), 'public');
@@ -141,6 +142,7 @@ app.get('/api/public/booking-availability', (req, res) => {
 });
 
 app.use('/api/admin', authRequired, adminRoutes);
+app.use('/api/ai', authRequired, aiControl);
 const portal = express.Router();
 portal.use(authRequired);
 portal.use((req, res, next) => ['client_contact'].includes((req as any).user.role) ? next() : res.status(403).json({ error: 'Client portal access required' }));
