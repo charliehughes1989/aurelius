@@ -56,6 +56,30 @@ label{font-size:13px;font-weight:700}
 .close{float:right;cursor:pointer;font-size:24px}
 @media(max-width:900px){.hero,.about{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.navlinks{display:none}}
 @media(max-width:600px){.hero h1{font-size:42px}.grid,.steps{grid-template-columns:1fr}section{padding:60px 5%}}
+
+.admin-login-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:#172033;
+  color:#fff !important;
+  padding:11px 17px;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:800;
+  text-decoration:none !important;
+  white-space:nowrap;
+  margin-left:12px;
+}
+.admin-login-button:hover{
+  background:#d71920;
+}
+@media(max-width:700px){
+  .admin-login-button{
+    padding:9px 11px;
+    font-size:11px;
+  }
+}
 </style>
 </head>
 <body>
@@ -70,6 +94,8 @@ label{font-size:13px;font-weight:700}
 <a href="/portal">Client Portal</a>
 <button class="btn red" onclick="openQuote()">Get a Quote</button>
 </div>
+
+<a href="/assessor" class="admin-login-button">Assessor / Admin Login</a>
 </nav>
 
 <header class="hero">
