@@ -1,4 +1,4 @@
-import { syncClientWorkflow, ensureWorkflow } from './AutomationEngine.ts';
+import { syncClientWorkflow, ensureWorkflow, runClientAutomation } from './AutomationEngine.ts';
 import { Router } from 'express';
 import { db, now } from './database.ts';
 

@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import Stripe from 'stripe';
 import { db } from './database.ts';
 
+import { runClientAutomation } from './AutomationEngine.ts';
 const router = Router();
 
 function getStripe(): Stripe | null {

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { randomUUID } from 'node:crypto';
 import { db, now } from './database.ts';
 
+import { runClientAutomation } from './AutomationEngine.ts';
 const router = Router();
 
 function parse(value: any) {

@@ -250,6 +250,18 @@ export function runClientAutomation(
   const current = c360.workflow;
   const stage = current.stage;
 
+  /*
+    CENTRAL WORKFLOW OVERRIDE
+
+    Automation is state-derived. Individual routes should record
+    facts; this function determines the resulting workflow stage.
+    Never move a client backwards because a late/duplicate event
+    was processed.
+  */
+  const currentIndex = WORKFLOW_STAGES.indexOf(
+    stage as WorkflowStage
+  );
+
   const quote = c360.quotes.find((q:any) =>
     ['accepted','approved'].includes(String(q.status).toLowerCase())
   );
@@ -287,8 +299,18 @@ export function runClientAutomation(
     !['completed','closed'].includes(String(a.status).toLowerCase())
   );
 
-  if (finalReport && completedAssessment && openActions.length === 0 && stage !== 'complete') {
-    return advanceWorkflow(clientId,'complete',reqActor,'Report complete and no open actions');
+  if (
+    finalReport &&
+    completedAssessment &&
+    openActions.length === 0 &&
+    stage !== 'complete'
+  ) {
+    return advanceWorkflow(
+      clientId,
+      'complete',
+      reqActor,
+      'Report complete and no open actions'
+    );
   }
 
   if (finalReport && stage !== 'actions' && stage !== 'complete') {
