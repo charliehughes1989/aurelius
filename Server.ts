@@ -11,7 +11,7 @@ import crypto from 'node:crypto';
 import adminRoutes from './Admin.ts';
 import { authRequired, clearSession, createUser, login, removeSession, setSession } from './auth.ts';
 import { db, enqueueNotification, getEntity, listEntities, now, saveEntity, writeAudit } from './database.ts';
-import { createCheckout, handleStripeWebhook } from './stripe.ts';
+import { createCheckout, handleStripeWebhook } from './StripeCheckout.ts';
 import documentsActions from './DocumentsActions.ts';
 import onboardingAutomation from './OnboardingAutomation.ts';
 import fileUploads from './FileUploads.ts';
@@ -31,7 +31,16 @@ const uploadDir = path.join(process.cwd(), 'data', 'uploads');
 fs.mkdirSync(publicDir, { recursive: true });
 fs.mkdirSync(uploadDir, { recursive: true });
 app.disable('x-powered-by');
-app.use((_req, res, next) => { res.setHeader('X-Content-Type-Options', 'nosniff'); res.setHeader('X-Frame-Options', 'DENY'); res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin'); res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'"); next(); });
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+  res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'");
+  // Block sensitive files
+  if (/\.(zip|sql|sqlite|db|env|bak|log)$/i.test(_req.path) || _req.path.includes('backup')) return res.status(404).json({error:'Not found'});
+  next();
+});
 const requestCounts = new Map<string, { count: number; resetAt: number }>();
 app.use((req, res, next) => { if (!req.path.startsWith('/api/auth') && !req.path.startsWith('/api/public')) return next(); const key = `${req.ip}:${req.path}`; const current = requestCounts.get(key); const timestamp = Date.now(); if (!current || current.resetAt <= timestamp) requestCounts.set(key, { count: 1, resetAt: timestamp + 60_000 }); else { current.count += 1; if (current.count > 60) return res.status(429).json({ error: 'Too many requests. Try again shortly.' }); } next(); });
 app.use(cors({ origin: process.env.PUBLIC_APP_URL || true, credentials: true }));
@@ -39,10 +48,6 @@ app.use((req, _res, next) => {
   const raw = req.headers.cookie ?? '';
   (req as any).cookies = Object.fromEntries(raw.split(';').filter(Boolean).map((part) => { const [key, ...value] = part.trim().split('='); return [key, decodeURIComponent(value.join('='))]; }));
   next();
-});
-app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), (req, res) => {
-  try { handleStripeWebhook(req.body as Buffer, (Array.isArray(req.headers['stripe-signature']) ? req.headers['stripe-signature'][0] : req.headers['stripe-signature'])); res.json({ received: true }); }
-  catch (error) { res.status(400).json({ error: error instanceof Error ? error.message : 'Invalid webhook' }); }
 });
 app.use(express.json({ limit: '25mb' }));
 

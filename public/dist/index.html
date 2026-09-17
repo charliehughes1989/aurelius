@@ -1,17 +1,280 @@
-<!doctype html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aurelius Fire | Professional Fire Risk Assessments</title><style>
-:root{--ink:#10233f;--blue:#145da0;--red:#d52b2b;--muted:#607089;--line:#dbe3ec;--soft:#f5f8fb}*{box-sizing:border-box}body{margin:0;color:var(--ink);font:15px/1.55 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--soft)}a{color:inherit}.header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:4}.nav{max-width:1180px;margin:auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font-weight:900;letter-spacing:.1em;font-size:18px}.brand span,.eyebrow{color:var(--red)}.links{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.links a{font-weight:700;text-decoration:none}.btn{border:0;border-radius:7px;padding:11px 16px;background:var(--blue);color:white;cursor:pointer;font:inherit;font-weight:750;text-decoration:none;display:inline-block}.btn.secondary{background:white;color:var(--blue);border:1px solid var(--blue)}.btn.red{background:var(--red)}main,.inner{max-width:1180px;margin:auto;padding:0 24px}.hero{background:linear-gradient(120deg,#fff,#eef5fb);border-bottom:1px solid var(--line)}.hero .inner{padding-top:78px;padding-bottom:68px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:12px;font-weight:850}.hero h1{font-size:clamp(40px,6vw,72px);line-height:1.02;max-width:780px;margin:14px 0}.hero p{font-size:19px;color:var(--muted);max-width:680px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.section{padding:54px 0}.section h2{font-size:31px;margin:0 0 18px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:22px;box-shadow:0 5px 18px #10233f0a}.card h3{margin-top:0}.price{font-size:30px;font-weight:900;color:var(--blue)}.muted{color:var(--muted)}.form{display:grid;gap:12px;max-width:700px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}input,textarea,select{font:inherit;padding:12px;border:1px solid #c8d3df;border-radius:6px;background:#fff;color:var(--ink);width:100%}textarea{min-height:110px;resize:vertical}.notice{padding:12px 14px;border-radius:6px;background:#eaf4ff;border:1px solid #b9d9f5;margin:12px 0}.error{background:#fff0f0;border-color:#f2b7b7;color:#9f2020}.hidden{display:none!important}.footer{background:#10233f;color:#fff;margin-top:40px}.footer .inner{padding-top:35px;padding-bottom:35px}.footer a{color:#d8e7f5;text-decoration:none}.shell{max-width:1240px;margin:auto;padding:28px 24px}.bar{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:24px}.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:22px}.tabs .btn{white-space:nowrap}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;background:#fff}.table th,.table td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.stat strong{font-size:28px;display:block}.modal{position:fixed;inset:0;background:#10233f66;display:grid;place-items:center;padding:20px;z-index:8}.modal>div{background:#fff;border-radius:8px;padding:25px;max-width:760px;width:100%;max-height:90vh;overflow:auto}.pill{display:inline-block;padding:3px 8px;border-radius:99px;background:#eaf4ff;color:var(--blue);font-size:12px;font-weight:750}.list{padding-left:18px}.empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed #bcc9d7;border-radius:8px}@media(max-width:760px){.nav{align-items:flex-start;flex-direction:column}.links{gap:10px}.grid,.stats,.two{grid-template-columns:1fr}.hero .inner{padding-top:52px}.section{padding:35px 0}.table{min-width:700px}}
-</style></head><body><header class="header"><nav class="nav"><a class="brand" href="#home">AURELIUS <span>FIRE</span></a><div class="links"><a href="#services">Services</a><a href="#pricing">Pricing</a><a href="#how">How it works</a><a href="#about">About</a><a href="#faq">FAQ</a><button class="btn secondary" onclick="openLogin()">Client / Admin login</button></div></nav></header><div id="site"><section id="home" class="hero"><div class="inner"><div class="eyebrow">Fire risk assessment and compliance</div><h1>Professional fire risk assessments for responsible people.</h1><p>Aurelius Fire provides clear, practical assessment services for suitable commercial premises, from first enquiry through reporting and follow-up.</p><div class="actions"><button class="btn red" onclick="openQuote()">Get a quote</button><button class="btn secondary" onclick="openBooking()">Book an assessment</button></div></div></section><main><section id="services" class="section"><h2>Services</h2><div id="services-grid" class="grid"></div></section><section id="pricing" class="section"><h2>Fixed pricing</h2><p class="muted">Prices are shown without VAT. Final suitability is confirmed from your premises information.</p><div id="pricing-grid" class="grid"></div></section><section id="how" class="section"><h2>How it works</h2><div class="grid"><article class="card"><h3>1. Tell us about your premises</h3><p class="muted">Complete a short enquiry with the information available to you.</p></article><article class="card"><h3>2. Review and arrange</h3><p class="muted">Receive a clear quote, agree the terms, and choose an available assessment slot.</p></article><article class="card"><h3>3. Assess and improve</h3><p class="muted">Access your report, documents, and follow-up actions through the secure portal.</p></article></div></section><section id="about" class="section"><h2>About Aurelius Fire</h2><div id="about-copy" class="card"><p class="muted">A professional fire safety service focused on clear reporting, responsible-person support, and defensible compliance decisions.</p></div></section><section id="faq" class="section"><h2>Frequently asked questions</h2><div id="faq-list" class="grid"></div></section><section id="contact" class="section"><h2>Contact Aurelius Fire</h2><form id="contact-form" class="form"><div class="two"><input name="name" required placeholder="Your name"><input name="company" placeholder="Company"><input name="email" type="email" required placeholder="Email"><input name="phone" placeholder="Telephone"></div><textarea name="message" required placeholder="How can we help?"></textarea><button class="btn">Send enquiry</button><div id="contact-result"></div></form></section></main><footer class="footer"><div class="inner"><div class="brand">AURELIUS <span>FIRE</span></div><p>Professional fire risk assessments and practical compliance support.</p><div class="links"><a href="#contact">Contact</a><a href="#faq">FAQ</a><a href="#terms">Terms</a><a href="#privacy">Privacy</a><a href="#" onclick="openLogin();return false">Client portal</a></div><p class="muted">Content, pricing and policies are managed through the Aurelius CRM.</p></div></footer></div><div id="login-modal" class="modal hidden"><div><h2>Secure access</h2><p class="muted">Sign in to the client portal or operations CRM.</p><form id="login-form" class="form"><input name="email" type="email" required placeholder="Email"><input name="password" type="password" required placeholder="Password"><button class="btn">Sign in</button><button type="button" class="btn secondary" onclick="closeModals()">Cancel</button><div id="login-result"></div></form></div></div><div id="quote-modal" class="modal hidden"><div><h2>Get a quote</h2><p class="muted">Tell us about your business and premises. We will save the enquiry and calculate an estimated package from configured pricing.</p><form id="quote-form" class="form"><div class="two"><input name="customerName" required placeholder="Your name"><input name="companyName" required placeholder="Business/company"><input name="email" type="email" required placeholder="Email"><input name="telephone" required placeholder="Telephone"><input name="premisesAddress" required placeholder="Premises address"><input name="postcode" required placeholder="Postcode"><input name="premisesType" required placeholder="Premises type"><input name="floors" type="number" min="1" required placeholder="Number of floors"><input name="approximateSize" type="number" min="1" required placeholder="Approximate size m²"><select name="sleepingAccommodation"><option value="false">No sleeping accommodation</option><option value="true">Sleeping accommodation</option></select></div><input name="occupancyInformation" required placeholder="Occupancy information"><textarea name="additionalInformation" placeholder="Additional information"></textarea><button class="btn red">Create estimated quote</button><button type="button" class="btn secondary" onclick="closeModals()">Cancel</button><div id="quote-result"></div></form></div></div><div id="booking-modal" class="modal hidden"><div><h2>Book an assessment</h2><p class="muted">Choose from availability managed by Aurelius. Slots are limited to the next 90 days.</p><div id="slots"></div><button type="button" class="btn secondary" onclick="closeModals()">Cancel</button><div id="booking-result"></div></div></div><div id="app" class="hidden"></div><script>
-const $=s=>document.querySelector(s),api=async(path,options={})=>{const response=await fetch('/api'+path,{credentials:'include',headers:{'Content-Type':'application/json',...(options.headers||{})},...options});const body=await response.json().catch(()=>({}));if(!response.ok)throw Error(body.error||'Request failed');return body};
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const open=(id)=>$(id).classList.remove('hidden');const closeModals=()=>document.querySelectorAll('.modal').forEach(x=>x.classList.add('hidden'));const openLogin=()=>open('#login-modal');const openQuote=()=>open('#quote-modal');
-async function loadPublic(){try{const [pricing,content]=await Promise.all([api('/public/pricing'),api('/public/content')]);$('#pricing-grid').innerHTML=pricing.packages.map(p=>`<article class="card"><h3>${esc(p.name)}</h3><div class="price">£${Number(p.price).toLocaleString()}</div><p class="muted">${esc(p.description||'Professional fire risk assessment package.')}</p>${p.criteria?`<p class="muted">${esc(p.criteria)}</p>`:''}</article>`).join('');const services=content.content.services||[{name:'Fire risk assessments',description:'Structured assessments aligned with RRFSO Article 9 and PAS 79 principles.'},{name:'Practical compliance',description:'Clear priorities, evidence-led findings, and actions your team can understand.'},{name:'Ongoing support',description:'Follow-up reviews, document exchange, and secure client portal access.'}];$('#services-grid').innerHTML=services.map(s=>`<article class="card"><h3>${esc(s.name)}</h3><p class="muted">${esc(s.description)}</p></article>`).join('');if(content.content.about)$('#about-copy').innerHTML=`<p>${esc(content.content.about)}</p>`;const faqs=content.content.faqs||[];$('#faq-list').innerHTML=faqs.length?faqs.map(f=>`<article class="card"><h3>${esc(f.question)}</h3><p class="muted">${esc(f.answer)}</p></article>`).join(''):'<div class="empty">No FAQs have been published yet.</div>'}catch(error){console.error(error)}}
-$('#contact-form').onsubmit=async e=>{e.preventDefault();const data=Object.fromEntries(new FormData(e.target));data.premises='Contact enquiry';data.service='General enquiry';try{const r=await api('/public/enquiries',{method:'POST',body:JSON.stringify(data)});$('#contact-result').className='notice';$('#contact-result').textContent=r.message;e.target.reset()}catch(error){$('#contact-result').className='notice error';$('#contact-result').textContent=error.message}};
-$('#quote-form').onsubmit=async e=>{e.preventDefault();try{const r=await api('/public/quotes',{method:'POST',body:JSON.stringify(Object.fromEntries(new FormData(e.target)))});$('#quote-result').className='notice';$('#quote-result').innerHTML=`Estimated price: <strong>£${Number(r.estimatedPrice).toLocaleString()}</strong><br>Quote number: ${esc(r.quoteNumber)}<br><a href="/quote.html?token=${encodeURIComponent(r.quoteToken)}">Review your quote</a>`;e.target.reset()}catch(error){$('#quote-result').className='notice error';$('#quote-result').textContent=error.message}};
-async function openBooking(){open('#booking-modal');try{const r=await api('/public/booking-availability');$('#slots').innerHTML=r.slots.length?r.slots.map(s=>`<button class="btn secondary" onclick="selectSlot('${esc(s.id)}')">${new Date(s.startsAt).toLocaleString()} - ${new Date(s.endsAt).toLocaleTimeString()}</button>`).join(' '):'<div class="empty">No upcoming assessment slots are available yet.</div>'}catch(error){$('#slots').innerHTML=`<div class="notice error">${esc(error.message)}</div>`}}window.selectSlot=id=>{$('#booking-result').className='notice';$('#booking-result').textContent='Please sign in to book this slot.';openLogin();sessionStorage.setItem('selectedSlot',id)};
-$('#login-form').onsubmit=async e=>{e.preventDefault();try{const r=await api('/auth/login',{method:'POST',body:JSON.stringify(Object.fromEntries(new FormData(e.target)))});location.href=r.user.role==='client_contact'?'/portal':'/admin'}catch(error){$('#login-result').className='notice error';$('#login-result').textContent=error.message}};
-async function renderApp(user){const app=$('#app');app.classList.remove('hidden');app.innerHTML=`<div class="shell"><div class="bar"><div><div class="eyebrow">Aurelius Fire</div><h1>${user.role==='client_contact'?'Client portal':'Operations CRM'}</h1><p class="muted">Signed in as ${esc(user.displayName)}</p></div><button class="btn secondary" id="logout">Sign out</button></div><div id="workspace"></div></div>`;$('#logout').onclick=async()=>{await api('/auth/logout',{method:'POST'});location.reload()};if(user.role==='client_contact')return renderPortal();return renderAdmin()}
-async function renderPortal(){const d=await api('/portal/dashboard');$('#workspace').innerHTML=`<div class="stats"><div class="card stat"><span class="muted">Quotes</span><strong>${d.quotes.length}</strong></div><div class="card stat"><span class="muted">Bookings</span><strong>${d.bookings.length}</strong></div><div class="card stat"><span class="muted">Documents</span><strong>${d.documents.length}</strong></div><div class="card stat"><span class="muted">Actions</span><strong>${d.actions.length}</strong></div></div><section class="section"><h2>${esc(d.client?.legalName||'Your account')}</h2><div class="grid"><div class="card"><h3>Quotes</h3>${rows(d.quotes,'quoteNumber','status')}</div><div class="card"><h3>Bookings</h3>${rows(d.bookings,'startsAt','status')}</div><div class="card"><h3>Documents</h3>${rows(d.documents,'fileName','category')}</div></div></section><section class="section"><h2>Messages</h2><form id="message-form" class="form"><input name="subject" placeholder="Subject"><textarea name="message" required placeholder="Message Aurelius Fire"></textarea><button class="btn">Send message</button><div id="message-result"></div></form></section>`;$('#message-form').onsubmit=async e=>{e.preventDefault();try{await api('/portal/messages',{method:'POST',body:JSON.stringify(Object.fromEntries(new FormData(e.target)))});$('#message-result').className='notice';$('#message-result').textContent='Message sent.';e.target.reset()}catch(error){$('#message-result').className='notice error';$('#message-result').textContent=error.message}}}
-async function renderAdmin(){const w=$('#workspace');w.innerHTML='<div class="tabs"><button class="btn" onclick="adminTab(\'dashboard\')">Dashboard</button><button class="btn secondary" onclick="adminTab(\'clients\')">Clients</button><button class="btn secondary" onclick="adminTab(\'quotes\')">Quotes</button><button class="btn secondary" onclick="adminTab(\'booking_slots\')">Calendar</button><button class="btn secondary" onclick="adminTab(\'pricing\')">Pricing</button><button class="btn secondary" onclick="adminTab(\'content\')">Website content</button><button class="btn secondary" onclick="adminTab(\'audit-log\')">Audit log</button></div><div id="admin-view"></div>';window.adminTab=async entity=>{const view=$('#admin-view');if(entity==='content')return contentEditor(view);if(entity==='dashboard'){const d=await api('/admin/dashboard');view.innerHTML='<div class="stats">'+Object.entries(d.counts).slice(0,8).map(([k,v])=>`<div class="card stat"><span class="muted">${esc(k)}</span><strong>${v}</strong></div>`).join('')+'</div>';return}const data=await api('/admin/'+entity);view.innerHTML=`<div class="bar"><h2>${esc(entity)}</h2><button class="btn" onclick="createRecord('${entity}')">Add record</button></div><div class="table-wrap"><table class="table"><thead><tr><th>ID</th><th>Status</th><th>Updated</th><th>Action</th></tr></thead><tbody>${data.length?data.map(x=>`<tr><td>${esc(x.quoteNumber||x.name||x.id)}</td><td><span class="pill">${esc(x.status)}</span></td><td>${esc(x.updatedAt||'')}</td><td><button class="btn secondary" onclick="archiveRecord('${entity}','${esc(x.id)}')">Archive</button></td></tr>`).join(''):'<tr><td colspan="4">No records yet.</td></tr>'}</tbody></table></div>`};window.createRecord=async entity=>{const raw=prompt('Enter JSON for '+entity);if(!raw)return;try{await api('/admin/'+entity,{method:'POST',body:raw});adminTab(entity)}catch(error){alert(error.message)}};window.archiveRecord=async(entity,id)=>{if(confirm('Archive this record?')){await api('/admin/'+entity+'/'+id+'/archive',{method:'POST',body:'{}'});adminTab(entity)}};adminTab('dashboard')}
-async function contentEditor(view){const current=(await api('/admin/content'));view.innerHTML='<h2>Website content</h2><p class="muted">Edit JSON content without changing code. Use keys such as about, services, faqs, contact, terms, and policies.</p><form id="content-form" class="form"><textarea name="json" required>'+esc(JSON.stringify(Object.fromEntries(Object.entries(current).map(([key,value])=>[key,value.value])),null,2))+'</textarea><button class="btn">Save content</button><div id="content-result"></div></form>';$('#content-form').onsubmit=async e=>{e.preventDefault();try{const parsed=JSON.parse(e.target.json.value);await api('/admin/content',{method:'PUT',body:JSON.stringify(parsed)});$('#content-result').className='notice';$('#content-result').textContent='Content saved.'}catch(error){$('#content-result').className='notice error';$('#content-result').textContent=error.message}}}
-function rows(items,a,b){return items.length?'<ul class="list">'+items.map(x=>`<li>${esc(x[a]||x.id)} — ${esc(x[b]||'')}</li>`).join('')+'</ul>':'<div class="empty">No records yet.</div>'}loadPublic();
-</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurelius Fire Risk | Fire Risk Assessments</title>
+<meta name="description" content="Independent UK fire risk assessments for commercial premises. Practical, proportionate and professionally produced.">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#172033;background:#fff}
+a{text-decoration:none;color:inherit}
+.nav{height:76px;border-bottom:1px solid #e8ebf0;display:flex;align-items:center;justify-content:space-between;padding:0 6%;position:sticky;top:0;background:#fff;z-index:20}
+.logo{font-weight:800;font-size:23px;letter-spacing:-.5px}
+.logo span{color:#d71920}
+.navlinks{display:flex;gap:28px;align-items:center;font-size:14px;font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:8px;padding:13px 20px;font-weight:700;cursor:pointer}
+.btn.red{background:#d71920;color:white}
+.btn.dark{background:#172033;color:white}
+.btn.light{background:#f2f4f7;color:#172033}
+.hero{padding:95px 6% 85px;background:linear-gradient(135deg,#f7f9fb 0%,#fff 65%);display:grid;grid-template-columns:1.2fr .8fr;gap:70px;align-items:center}
+.hero h1{font-size:58px;line-height:1.02;letter-spacing:-2.5px;margin:0 0 24px}
+.hero h1 span{color:#d71920}
+.hero p{font-size:19px;line-height:1.65;color:#5b6575;max-width:650px}
+.hero-card{background:#172033;color:#fff;border-radius:18px;padding:35px;box-shadow:0 20px 60px #17203322}
+.hero-card h3{font-size:25px;margin-top:0}
+.hero-card .price{font-size:42px;font-weight:800}
+section{padding:85px 6%}
+.section-head{max-width:700px;margin-bottom:45px}
+.section-head h2{font-size:40px;letter-spacing:-1.5px;margin:0 0 14px}
+.section-head p{color:#687386;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.card{border:1px solid #e5e8ed;border-radius:14px;padding:28px;background:#fff}
+.card h3{margin-top:0}
+.card p{color:#687386;line-height:1.55}
+.price-card{position:relative}
+.price-card .price{font-size:35px;font-weight:800;margin:15px 0}
+.price-card ul{padding-left:20px;color:#5f6978;line-height:1.8}
+.price-card.featured{border:2px solid #d71920}
+.badge{font-size:11px;background:#d71920;color:#fff;padding:5px 9px;border-radius:20px;display:inline-block}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:25px}
+.step{background:#f6f8fa;padding:30px;border-radius:15px}
+.num{font-size:34px;font-weight:800;color:#d71920}
+.about{background:#172033;color:#fff;display:grid;grid-template-columns:1fr 1fr;gap:70px}
+.about p{color:#c5ccd7;line-height:1.7}
+.about-img{min-height:350px;background:#293449;border-radius:18px;display:flex;align-items:center;justify-content:center;color:#8994a5}
+.cta{background:#d71920;color:white;text-align:center}
+.cta h2{font-size:42px;margin-top:0}
+.cta p{opacity:.9}
+footer{background:#101622;color:#aeb6c4;padding:45px 6%;display:flex;justify-content:space-between}
+footer strong{color:white}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modalbox{background:white;width:min(650px,100%);max-height:90vh;overflow:auto;border-radius:16px;padding:35px}
+input,select,textarea{width:100%;padding:13px;border:1px solid #d8dde5;border-radius:8px;margin:7px 0 16px;font:inherit}
+label{font-size:13px;font-weight:700}
+.close{float:right;cursor:pointer;font-size:24px}
+@media(max-width:900px){.hero,.about{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.navlinks{display:none}}
+@media(max-width:600px){.hero h1{font-size:42px}.grid,.steps{grid-template-columns:1fr}section{padding:60px 5%}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+<div class="logo">AURELIUS <span>FIRE</span></div>
+<div class="navlinks">
+<a href="#services">Services</a>
+<a href="#pricing">Pricing</a>
+<a href="#about">About</a>
+<a href="#process">How it works</a>
+<a href="/portal">Client Portal</a>
+<button class="btn red" onclick="openQuote()">Get a Quote</button>
+</div>
+<a href="/assessor" style="font-weight:700;">Assessor / Admin Login</a></nav>
+
+<header class="hero">
+<div>
+<div class="badge">INDEPENDENT FIRE RISK ASSESSMENTS</div>
+<h1>Fire safety made <span>clear.</span></h1>
+<p>Professional fire risk assessments for commercial premises. Practical, proportionate and focused on the things that genuinely matter to life safety.</p>
+<button class="btn red" onclick="openQuote()">Get your fixed-price quote</button>
+<button class="btn light" onclick="location.href='#pricing'" style="margin-left:8px">View pricing</button>
+</div>
+<div class="hero-card">
+<h3>Simple fixed pricing</h3>
+<div class="price">From £345</div>
+<p>No complicated pricing. Tell us about your premises and we'll confirm the appropriate assessment.</p>
+<button class="btn red" style="width:100%" onclick="openQuote()">Start enquiry</button>
+</div>
+</header>
+
+<section id="services">
+<div class="section-head">
+<h2>Fire risk assessments without the waffle.</h2>
+<p>Designed for businesses that need a competent, practical assessment and a clear action plan.</p>
+</div>
+<div class="grid">
+<div class="card"><h3>Commercial FRAs</h3><p>Life-safety focused assessments for shops, offices, salons, gyms, units and other commercial premises.</p></div>
+<div class="card"><h3>Type 1</h3><p>Non-intrusive visual assessment of accessible areas, with clear limitations and recommendations.</p></div>
+<div class="card"><h3>Reviews</h3><p>Existing assessments reviewed where circumstances, premises or arrangements have changed.</p></div>
+<div class="card"><h3>Action Plans</h3><p>Clear prioritised actions so responsible persons know what needs addressing and when.</p></div>
+</div>
+</section>
+
+<section id="pricing" style="background:#f7f8fa">
+<div class="section-head">
+<h2>Fixed pricing.</h2>
+<p>Simple pricing for straightforward non-sleeping commercial premises.</p>
+</div>
+<div class="grid">
+<div class="card price-card"><h3>Small</h3><div class="price">£345</div><p>One floor, no sleeping accommodation.</p><ul><li>Small commercial premises</li><li>Visual Type 1 assessment</li><li>Digital report</li></ul><button class="btn dark" onclick="openQuote()">Enquire</button></div>
+<div class="card price-card"><h3>Standard</h3><div class="price">£495</div><p>Two floors, no sleeping accommodation.</p><ul><li>Commercial premises</li><li>Visual Type 1 assessment</li><li>Digital report</li></ul><button class="btn dark" onclick="openQuote()">Enquire</button></div>
+<div class="card price-card featured"><span class="badge">POPULAR</span><h3>Larger</h3><div class="price">£695</div><p>Three floors or larger footprint.</p><ul><li>Commercial premises</li><li>Detailed assessment</li><li>Digital report</li></ul><button class="btn red" onclick="openQuote()">Enquire</button></div>
+<div class="card price-card"><h3>Complex</h3><div class="price">£995</div><p>Four or more floors or larger complex premises.</p><ul><li>Commercial premises</li><li>Detailed assessment</li><li>Digital report</li></ul><button class="btn dark" onclick="openQuote()">Enquire</button></div>
+</div>
+</section>
+
+<section id="process">
+<div class="section-head"><h2>How it works</h2><p>From enquiry to completed report through one simple client portal.</p></div>
+<div class="steps">
+<div class="step"><div class="num">01</div><h3>Tell us about your premises</h3><p>Complete the short enquiry form and provide the basic details.</p></div>
+<div class="step"><div class="num">02</div><h3>Confirm your assessment</h3><p>Receive your quote, accept the terms and choose an available appointment.</p></div>
+<div class="step"><div class="num">03</div><h3>Receive your report</h3><p>Your completed assessment, actions and documents are managed through your portal.</p></div>
+</div>
+</section>
+
+<section id="about" class="about">
+<div>
+<h2>About Aurelius Fire</h2>
+<p>Independent fire risk assessment services focused on practical compliance and life safety.</p>
+<p>Aurelius Fire provides straightforward assessments for commercial premises, with clear reporting and prioritised actions rather than unnecessary complication.</p>
+<button class="btn red" onclick="openQuote()">Start an enquiry</button>
+</div>
+<div class="about-img">YOUR PHOTO / ABOUT IMAGE</div>
+</section>
+
+<section class="cta">
+<h2>Need a fire risk assessment?</h2>
+<p>Tell us about your premises and we'll help identify the appropriate assessment.</p>
+<button class="btn dark" onclick="openQuote()">Get a quote</button>
+</section>
+
+<footer>
+<div><strong>AURELIUS FIRE</strong><br>Independent Fire Risk Assessment Services</div>
+<div>© <span id="year"></span> Aurelius Fire</div>
+</footer>
+
+<div class="modal" id="quoteModal">
+<div class="modalbox">
+<div class="close" onclick="closeQuote()">×</div>
+<h2>Request a quote</h2>
+<p>Tell us about your premises.</p>
+<form id="quoteForm">
+<label>Your name</label><input required name="name">
+<label>Email</label><input required type="email" name="email">
+<label>Phone</label><input name="phone">
+<label>Business</label><input name="business">
+<label>Premises address</label><textarea required name="address"></textarea>
+<label>Number of floors</label><select name="floors"><option>1</option><option>2</option><option>3</option><option>4+</option></select>
+<label>Approximate size</label><input name="size" placeholder="e.g. 1,500 sq ft">
+<label>Premises type</label><input name="type" placeholder="Shop, office, salon, gym etc.">
+<label>Sleeping accommodation?</label><select name="sleeping"><option>No</option><option>Yes</option></select>
+<button class="btn red" style="width:100%">Submit enquiry</button>
+</form>
+<div id="quoteResult"></div>
+</div>
+</div>
+
+<script>
+document.getElementById('year').textContent=new Date().getFullYear();
+function openQuote(){document.getElementById('quoteModal').classList.add('open')}
+function closeQuote(){document.getElementById('quoteModal').classList.remove('open')}
+
+
+<script id="aurelius-public-enquiry-handler">
+(function(){
+  function findForm(){
+    const forms=[...document.querySelectorAll('form')];
+    return forms.find(f =>
+      /enquir|quote|assessment|contact|book/i.test(
+        (f.innerText||'')+' '+(f.getAttribute('action')||'')+' '+(f.id||'')
+      )
+    );
+  }
+
+  async function submitEnquiry(form){
+    const data={};
+    new FormData(form).forEach((value,key)=>{
+      data[key]=value;
+    });
+
+    const normalised={
+      clientName:data.clientName || data.name || data.fullName || data.contactName || '',
+      name:data.name || data.clientName || '',
+      email:data.email || data.emailAddress || '',
+      phone:data.phone || data.telephone || '',
+      company:data.company || data.business || data.businessName || data.organisation || '',
+      businessName:data.businessName || data.company || data.business || '',
+      premiseName:data.premiseName || data.businessName || data.company || data.business || 'Premises',
+      address:data.address || data.siteAddress || '',
+      postcode:data.postcode || data.postCode || '',
+      floors:String(data.floors || data.numberOfFloors || '1').trim().toLowerCase() === '4+' ? 4 : (Number(data.floors || data.numberOfFloors || 1) || 1),
+      floorAreaSqFt:Number(String(data.floorAreaSqFt || data.area || data.sizeSqFt || data.size || '').replace(/[^0-9.]/g,'')) || '',
+      useType:data.useType || data.businessType || data.premiseType || data.type || '',
+      occupancy:data.occupancy || '',
+      sleepingAccommodation:['yes','true','1'].includes(String(data.sleepingAccommodation || data.sleeping || data.hasSleepingAccommodation || '').trim().toLowerCase()),
+      message:data.message || data.notes || data.enquiry || '',
+      source:'website'
+    };
+
+    if(!normalised.email){
+      return;
+    }
+
+    const response=await fetch('/api/public/enquiry',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(normalised)
+    });
+
+    if(!response.ok) throw new Error('Enquiry failed');
+
+    return response.json();
+  }
+
+  document.addEventListener('submit',async function(event){
+    const form=event.target;
+    if(!(form instanceof HTMLFormElement)) return;
+
+    const action=(form.getAttribute('action')||'').toLowerCase();
+
+    if(
+      !/enquir|quote|assessment|contact/i.test(
+        (form.innerText||'')+' '+action+' '+(form.id||'')
+      )
+    ) return;
+
+    if(form.dataset.aureliusPublicEnquiryHandler==='1') return;
+
+    event.preventDefault();
+    form.dataset.aureliusPublicEnquiryHandler='1';
+
+    try{
+      const result=await submitEnquiry(form);
+
+      const quote=result && result.quote;
+
+      const message=quote
+        ? 'Thank you. Your enquiry has been received and your indicative fixed quote is £'+quote.amount+'.'
+        : 'Thank you. Your enquiry has been received. We will review the premises details and contact you.';
+
+      let notice=form.querySelector('.aurelius-enquiry-result');
+
+      if(!notice){
+        notice=document.createElement('div');
+        notice.className='aurelius-enquiry-result';
+        notice.style.cssText='margin-top:15px;padding:14px;border-radius:10px;background:#eff6ff;color:#1e3a8a;font-weight:600';
+        form.appendChild(notice);
+      }
+
+      notice.textContent=message;
+      form.reset();
+
+    }catch(error){
+      let notice=form.querySelector('.aurelius-enquiry-result');
+
+      if(!notice){
+        notice=document.createElement('div');
+        notice.className='aurelius-enquiry-result';
+        notice.style.cssText='margin-top:15px;padding:14px;border-radius:10px;background:#fef2f2;color:#991b1b;font-weight:600';
+        form.appendChild(notice);
+      }
+
+      notice.textContent='We could not submit the enquiry. Please try again.';
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
