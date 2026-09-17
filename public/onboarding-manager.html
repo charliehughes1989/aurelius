@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurelius — Client Onboarding</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f5f7fa;color:#172033;font-family:Inter,Arial,sans-serif}
+header{background:#fff;border-bottom:1px solid #e5e7eb;padding:18px 28px;display:flex;justify-content:space-between}
+.logo{font-size:20px;font-weight:800;color:#123b69}
+.logo span{color:#c62828}
+main{max-width:1250px;margin:auto;padding:30px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:22px;margin-bottom:20px}
+h1{margin:0 0 5px}
+.sub{color:#6b7280;margin-bottom:25px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.full{grid-column:1/-1}
+label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;font:inherit}
+textarea{min-height:90px}
+button{background:#123b69;color:white;border:0;border-radius:8px;padding:11px 17px;font-weight:700;cursor:pointer}
+button.secondary{background:#e8eef5;color:#123b69}
+.check{display:flex;gap:10px;padding:9px 0}
+.check input{width:auto}
+.status{padding:12px;border-radius:9px;background:#f1f5f9;margin-bottom:20px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">AURELIUS <span>FIRE</span></div>
+<div>Client Onboarding</div>
+</header>
+
+<main>
+
+<h1>Client Onboarding</h1>
+<div class="sub">Collect the information required before the fire risk assessment visit.</div>
+
+<div class="card">
+<label>Client ID</label>
+<input id="clientId" placeholder="Enter client ID">
+<br><br>
+<button onclick="loadClient()">Load Existing</button>
+</div>
+
+<form id="form">
+
+<div class="card">
+<h2>Client Details</h2>
+<div class="grid">
+<div><label>Business name</label><input id="businessName"></div>
+<div><label>Responsible person / contact</label><input id="contactName"></div>
+<div><label>Email</label><input id="email" type="email"></div>
+<div><label>Phone</label><input id="phone"></div>
+</div>
+</div>
+
+<div class="card">
+<h2>Premises</h2>
+<div class="grid">
+<div><label>Premises name</label><input id="premisesName"></div>
+<div><label>Premises type</label><input id="premisesType"></div>
+<div class="full"><label>Address</label><input id="premisesAddress"></div>
+<div><label>Postcode</label><input id="postcode"></div>
+<div><label>Number of floors</label><input id="floors"></div>
+<div><label>Approximate floor area</label><input id="approximateArea"></div>
+<div><label>Typical occupancy</label><input id="occupancy"></div>
+<div><label>Operating hours</label><input id="operatingHours"></div>
+<div><label>Sleeping risk</label>
+<select id="sleepingRisk">
+<option>No</option>
+<option>Yes</option>
+</select>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h2>Building / Construction</h2>
+<div class="grid">
+<div class="full"><label>Construction</label><textarea id="construction"></textarea></div>
+<div><label>External walls</label><input id="externalWalls"></div>
+<div><label>Roof</label><input id="roof"></div>
+<div><label>Floor construction</label><input id="floorsConstruction"></div>
+</div>
+</div>
+
+<div class="card">
+<h2>Means of Escape</h2>
+<div class="grid">
+<div><label>Number / description of exits</label><textarea id="exits"></textarea></div>
+<div><label>Final exits</label><textarea id="finalExits"></textarea></div>
+<div><label>Escape stairs</label><textarea id="escapeStairs"></textarea></div>
+<div><label>Emergency routes</label><textarea id="emergencyRoutes"></textarea></div>
+</div>
+</div>
+
+<div class="card">
+<h2>Fire Safety Systems</h2>
+<div class="grid">
+<div><label>Fire alarm / detection</label><textarea id="fireAlarm"></textarea></div>
+<div><label>Emergency lighting</label><textarea id="emergencyLighting"></textarea></div>
+<div><label>Fire extinguishers</label><textarea id="extinguishers"></textarea></div>
+<div><label>Fire doors</label><textarea id="fireDoors"></textarea></div>
+<div><label>Fire safety signage</label><textarea id="signage"></textarea></div>
+</div>
+</div>
+
+<div class="card">
+<h2>Compliance Information</h2>
+<div class="grid">
+<div><label>Electrical installation / EICR</label><textarea id="electricalInstallation"></textarea></div>
+<div><label>Gas installation / certificate</label><textarea id="gasInstallation"></textarea></div>
+<div><label>Heating</label><textarea id="heating"></textarea></div>
+<div><label>Previous FRA</label><textarea id="previousFra"></textarea></div>
+<div><label>Fire strategy</label><textarea id="fireStrategy"></textarea></div>
+<div><label>Known significant findings</label><textarea id="significantFindings"></textarea></div>
+</div>
+</div>
+
+<div class="card">
+<h2>Additional Information</h2>
+<div class="grid">
+<div><label>Special risks</label><textarea id="specialRisks"></textarea></div>
+<div><label>Contractors / shared premises</label><textarea id="contractors"></textarea></div>
+<div class="full"><label>Anything else the assessor should know</label><textarea id="additionalInformation"></textarea></div>
+</div>
+</div>
+
+<div class="card">
+<button type="button" onclick="save()">Save onboarding</button>
+<button type="button" class="secondary" onclick="complete()">Complete & submit</button>
+<div id="status" style="margin-top:15px"></div>
+</div>
+
+</form>
+</main>
+
+<script>
+const ids=[
+'clientId','businessName','contactName','email','phone',
+'premisesName','premisesType','premisesAddress','postcode',
+'floors','approximateArea','occupancy','operatingHours',
+'sleepingRisk','construction','externalWalls','roof',
+'floorsConstruction','exits','finalExits','escapeStairs',
+'emergencyRoutes','fireAlarm','emergencyLighting','extinguishers',
+'fireDoors','signage','electricalInstallation','gasInstallation',
+'heating','previousFra','fireStrategy','significantFindings',
+'specialRisks','contractors','additionalInformation'
+];
+
+function data(){
+ const o={};
+ ids.forEach(id=>{
+   if(id!=='clientId') o[id]=document.getElementById(id)?.value||'';
+ });
+ return o;
+}
+
+async function save(){
+ const id=document.getElementById('clientId').value.trim();
+
+ if(!id){
+   alert('Enter a Client ID first.');
+   return;
+ }
+
+ try{
+  const r=await fetch('/api/onboarding-automation/onboarding/'+encodeURIComponent(id),{
+   method:'POST',
+   headers:{'Content-Type':'application/json'},
+   body:JSON.stringify(data())
+  });
+
+  const result=await r.json();
+
+  if(!r.ok) throw new Error(result.error||'Save failed');
+
+  status.textContent='Saved successfully.';
+  status.style.color='green';
+ }catch(e){
+  status.textContent=e.message;
+  status.style.color='#b91c1c';
+ }
+}
+
+async function complete(){
+ await save();
+
+ const id=document.getElementById('clientId').value.trim();
+ if(!id)return;
+
+ const r=await fetch('/api/onboarding-automation/onboarding/'+encodeURIComponent(id)+'/complete',{
+  method:'POST',
+  headers:{'Content-Type':'application/json'}
+ });
+
+ const result=await r.json();
+
+ if(!r.ok){
+  alert(result.error||'Could not complete onboarding');
+  return;
+ }
+
+ status.textContent='Onboarding completed and submitted.';
+ status.style.color='green';
+}
+
+async function loadClient(){
+ const id=document.getElementById('clientId').value.trim();
+
+ if(!id){
+  alert('Enter a Client ID first.');
+  return;
+ }
+
+ try{
+  const r=await fetch('/api/onboarding-automation/onboarding/'+encodeURIComponent(id));
+  const result=await r.json();
+
+  const d=result.data||{};
+
+  Object.keys(d).forEach(key=>{
+   const el=document.getElementById(key);
+   if(el && key!=='clientId') el.value=d[key]??'';
+  });
+
+  status.textContent='Existing onboarding loaded.';
+  status.style.color='#123b69';
+ }catch(e){
+  status.textContent='Could not load onboarding.';
+  status.style.color='#b91c1c';
+ }
+}
+</script>
+</body>
+</html>

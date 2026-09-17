@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurelius — Workflow Centre</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f5f7fa;color:#172033;font-family:Inter,Arial,sans-serif}
+header{background:white;border-bottom:1px solid #e5e7eb;padding:18px 28px;display:flex;justify-content:space-between}
+.logo{font-weight:800;font-size:20px;color:#123b69}
+.logo span{color:#c62828}
+main{max-width:1200px;margin:auto;padding:30px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:white;border:1px solid #e5e7eb;border-radius:14px;padding:22px}
+.number{font-size:34px;font-weight:800}
+.label{color:#6b7280;margin-top:5px}
+h1{margin-bottom:5px}
+.sub{color:#6b7280;margin-bottom:25px}
+input,textarea{width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;font:inherit}
+textarea{min-height:130px}
+button{margin-top:10px;background:#123b69;color:white;border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer}
+.message{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-top:12px}
+small{color:#6b7280}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">AURELIUS <span>FIRE</span></div>
+<div>Workflow Centre</div>
+</header>
+
+<main>
+
+<h1>Workflow Centre</h1>
+<div class="sub">Monitor onboarding, pre-visit work, messages and client communications.</div>
+
+<div class="grid">
+<div class="card"><div class="number" id="onboarding">0</div><div class="label">Onboarding records</div></div>
+<div class="card"><div class="number" id="completed">0</div><div class="label">Completed onboarding</div></div>
+<div class="card"><div class="number" id="previsit">0</div><div class="label">Pre-visit records</div></div>
+<div class="card"><div class="number" id="messages">0</div><div class="label">Messages</div></div>
+<div class="card"><div class="number" id="notifications">0</div><div class="label">Notifications</div></div>
+<div class="card"><div class="number" id="openActions">0</div><div class="label">Open actions</div></div>
+</div>
+
+<div class="card" style="margin-top:22px">
+<h2>Send Client Message</h2>
+
+<label>Client ID</label>
+<input id="clientId">
+
+<br><br>
+
+<label>Subject</label>
+<input id="subject">
+
+<br><br>
+
+<label>Message</label>
+<textarea id="message"></textarea>
+
+<br>
+
+<button onclick="sendMessage()">Send message</button>
+
+<div id="result"></div>
+</div>
+
+</main>
+
+<script>
+async function refresh(){
+ const r=await fetch('/api/onboarding-automation/workflow-summary');
+ const s=await r.json();
+
+ onboarding.textContent=s.onboarding||0;
+ completed.textContent=s.completedOnboarding||0;
+ previsit.textContent=s.previsit||0;
+ messages.textContent=s.messages||0;
+ notifications.textContent=s.notifications||0;
+ openActions.textContent=s.openActions||0;
+}
+
+async function sendMessage(){
+ const id=clientId.value.trim();
+
+ if(!id){
+  alert('Enter Client ID');
+  return;
+ }
+
+ const r=await fetch('/api/onboarding-automation/messages',{
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({
+   clientId:id,
+   subject:subject.value,
+   message:message.value,
+   from:'Aurelius Fire Risk'
+  })
+ });
+
+ const data=await r.json();
+
+ if(!r.ok){
+  result.textContent=data.error||'Message failed';
+  result.style.color='#b91c1c';
+  return;
+ }
+
+ result.textContent='Message sent and client notification created.';
+ result.style.color='green';
+
+ subject.value='';
+ message.value='';
+
+ refresh();
+}
+
+refresh();
+</script>
+</body>
+</html>

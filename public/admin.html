@@ -1,11 +1,1044 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aurelius Fire CRM</title><style>:root{--ink:#10233f;--blue:#145da0;--red:#d52b2b;--muted:#607089;--line:#dbe3ec;--soft:#f5f8fb}*{box-sizing:border-box}body{margin:0;background:var(--soft);color:var(--ink);font:15px/1.5 system-ui,sans-serif}.shell{max-width:1240px;margin:auto;padding:28px 24px}.bar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}.brand{font-weight:900;letter-spacing:.1em}.brand span,.eyebrow{color:var(--red)}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:12px;font-weight:800}.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:22px}.btn{border:0;border-radius:7px;padding:10px 15px;background:var(--blue);color:#fff;font:inherit;font-weight:750;cursor:pointer;white-space:nowrap}.btn.secondary{background:#fff;color:var(--blue);border:1px solid var(--blue)}.btn.red{background:var(--red)}.btn.small{padding:7px 10px;font-size:13px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:20px;box-shadow:0 5px 18px #10233f0a}.card h2,.card h3{margin-top:0}.form{display:grid;gap:11px}label{display:grid;gap:5px;font-weight:700}input,textarea,select{width:100%;font:inherit;padding:10px;border:1px solid #c8d3df;border-radius:6px;background:#fff;color:var(--ink)}textarea{min-height:88px;resize:vertical}.notice{padding:11px 13px;border-radius:6px;background:#eaf4ff;border:1px solid #b9d9f5;margin:10px 0}.error{background:#fff0f0;border-color:#f2b7b7;color:#9f2020}.muted{color:var(--muted)}.stat strong{font-size:30px;display:block}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;background:#fff}.table th,.table td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}.pill{display:inline-block;padding:3px 8px;border-radius:20px;background:#eaf4ff;color:var(--blue);font-size:12px;font-weight:750}.pill.red{background:#fff0f0;color:#a21e1e}.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed #bcc9d7;border-radius:8px}.photo{width:160px;height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:#eef3f7}.actions{display:flex;gap:7px;flex-wrap:wrap}.modal{position:fixed;inset:0;background:#10233f66;display:grid;place-items:center;padding:18px;z-index:3}.modal>div{background:#fff;border-radius:8px;padding:24px;width:min(760px,100%);max-height:92vh;overflow:auto}.hidden{display:none!important}@media(max-width:760px){.grid,.two{grid-template-columns:1fr}.bar{align-items:flex-start;flex-direction:column}.shell{padding:20px 14px}.table{min-width:720px}}
-</style></head><body><main class="shell"><div class="bar"><div><div class="brand">AURELIUS <span>FIRE</span></div><div class="eyebrow">Operations CRM</div><h1>Business control</h1></div><button class="btn secondary" id="logout">Sign out</button></div><nav class="tabs"><button class="btn" data-view="dashboard">Dashboard</button><button class="btn secondary" data-view="clients">Clients</button><button class="btn secondary" data-view="quotes">Quotes</button><button class="btn secondary" data-view="calendar">Calendar</button><button class="btn secondary" data-view="pricing">Pricing</button><button class="btn secondary" data-view="content">Website content</button><button class="btn secondary" data-view="services">Services</button><button class="btn secondary" data-view="faqs">FAQs</button><button class="btn secondary" data-view="audit">Audit log</button></nav><section id="view"></section></main><div id="quote-modal" class="modal hidden"><div><div class="bar"><h2>Quote details</h2><button class="btn secondary" onclick="closeQuote()">Close</button></div><div id="quote-detail"></div></div></div><script>const $=s=>document.querySelector(s),api=async(path,options={})=>{const r=await fetch('/api'+path,{credentials:'include',headers:{'Content-Type':'application/json',...(options.headers||{})},...options});const b=await r.json().catch(()=>({}));if(!r.ok)throw Error(b.error||'Request failed');return b};const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const msg=(x,bad=false)=>`<div class="notice${bad?' error':''}">${esc(x)}</div>`;const empty=x=>`<div class="empty">${x}</div>`;const json=(x)=>JSON.stringify(x);
-async function dashboard(){const d=await api('/admin/dashboard');const cards=[['Open enquiries',d.openEnquiries,'enquiries'],['Outstanding quotes',d.outstandingQuotes,'quotes'],['Accepted quotes',d.acceptedQuotes,'quotes'],['Upcoming bookings',d.upcomingBookings,'calendar'],['Outstanding actions',d.outstandingActions,'actions'],['Unread messages',d.unreadMessages,'messages'],['Reports awaiting upload',d.documentsAwaitingUpload,'documents']];$('#view').innerHTML='<div class="grid">'+cards.map(([label,value,view])=>`<button class="card stat" data-jump="${view}" style="text-align:left;border:1px solid var(--line);cursor:pointer"><span class="eyebrow">${label}</span><strong>${value}</strong><span class="muted">Open section</span></button>`).join('')+'</div>';document.querySelectorAll('[data-jump]').forEach(x=>x.onclick=()=>show(x.dataset.jump))}
-async function content(){const r=await api('/admin/content');const v=Object.fromEntries(Object.entries(r).map(([k,x])=>[k,x.value]));$('#view').innerHTML=`<form id="content-form" class="form"><div class="card"><h2>Homepage and contact</h2><div class="two"><label>Hero heading<input name="heroHeading" value="${esc(v.heroHeading)}"></label><label>Primary button<input name="primaryButton" value="${esc(v.primaryButton||'Get a quote')}"></label></div><label>Hero text<textarea name="heroText">${esc(v.heroText)}</textarea></label><div class="two"><label>Telephone<input name="telephone" value="${esc(v.telephone)}"></label><label>Email<input name="email" value="${esc(v.email)}"></label></div><label>Address/service area<textarea name="address">${esc(v.address)}</textarea></label></div><div class="card"><h2>About Me</h2><div class="two"><label>Name<input name="aboutName" value="${esc(v.aboutName)}"></label><label>Photo URL<input name="profilePhoto" value="${esc(v.profilePhoto)}" readonly></label></div><label>Biography<textarea name="aboutBiography">${esc(v.aboutBiography||v.about)}</textarea></label><label>Qualifications<textarea name="aboutQualifications">${esc(v.aboutQualifications)}</textarea></label><label>Experience<textarea name="aboutExperience">${esc(v.aboutExperience)}</textarea></label><label>Services description<textarea name="aboutServices">${esc(v.aboutServices)}</textarea></label><div class="actions"><button type="button" class="btn secondary" onclick="uploadPhoto()">Choose/upload photograph</button><button type="button" class="btn secondary" onclick="deletePhoto()">Delete photograph</button></div><div id="photo-result"></div><img id="photo-preview" class="photo ${v.profilePhoto?'':'hidden'}" src="${esc(v.profilePhoto)}" alt="Current profile photograph"></div><div class="card"><h2>Policies</h2><label>Terms<textarea name="terms">${esc(v.terms)}</textarea></label><label>Privacy<textarea name="privacy">${esc(v.privacy)}</textarea></label><label>Cookie information<textarea name="cookies">${esc(v.cookies)}</textarea></label></div><button class="btn red">Save changes</button><div id="content-result"></div></form>`;$('#content-form').onsubmit=async e=>{e.preventDefault();try{await api('/admin/content',{method:'PUT',body:json(Object.fromEntries(new FormData(e.target)))});$('#content-result').innerHTML=msg('Website content saved.')}catch(err){$('#content-result').innerHTML=msg(err.message,true)}}}
-window.uploadPhoto=()=>{const input=document.createElement('input');input.type='file';input.accept='image/jpeg,image/png,image/webp';input.onchange=()=>{const file=input.files[0];if(!file)return;if(file.size>5*1024*1024)return $('#photo-result').innerHTML=msg('Photo must be 5MB or smaller.',true);const reader=new FileReader();reader.onload=async()=>{try{const r=await api('/admin/content/profile-photo',{method:'POST',body:json({mimeType:file.type,content:String(reader.result).split(',')[1]})});$('#photo-preview').src=r.url;$('#photo-preview').classList.remove('hidden');$('#photo-result').innerHTML=msg('Photograph uploaded successfully.')}catch(err){$('#photo-result').innerHTML=msg(err.message,true)}};reader.readAsDataURL(file)};input.click()};window.deletePhoto=async()=>{try{await api('/admin/content/profile-photo',{method:'DELETE'});$('#photo-preview').classList.add('hidden');$('#photo-result').innerHTML=msg('Photograph deleted.')}catch(err){$('#photo-result').innerHTML=msg(err.message,true)}};
-async function pricing(){const items=await api('/admin/pricing');$('#view').innerHTML='<div class="bar"><h2>Pricing packages</h2><button class="btn red" onclick="newPricing()">Add package</button></div><div class="grid">'+(items.length?items.map(x=>`<form class="card price-form form" data-id="${esc(x.id)}"><h3>${esc(x.name)}</h3><input name="name" value="${esc(x.name)}" required><input name="price" type="number" min="0" value="${esc(x.price)}" required><textarea name="description" placeholder="Description">${esc(x.description)}</textarea><input name="criteria" value="${esc(x.criteria)}" placeholder="Criteria"><input name="order" type="number" value="${esc(x.order)}"><label>Active <input name="active" type="checkbox" ${x.status==='active'?'checked':''}></label><div class="actions"><button class="btn">Save</button><button type="button" class="btn secondary" onclick="archiveRecord('${esc(x.id)}')">${x.status==='archived'?'Restore':'Archive'}</button><button type="button" class="btn secondary" onclick="deleteRecord('${esc(x.id)}')">Delete</button></div><div class="result"></div></form>`).join(''):empty('No pricing packages yet.')+'</div>';document.querySelectorAll('.price-form').forEach(f=>f.onsubmit=async e=>{e.preventDefault();const data=Object.fromEntries(new FormData(f));data.status=f.querySelector('[name=active]').checked?'active':'inactive';try{await api('/admin/pricing/'+f.dataset.id,{method:'PUT',body:json(data)});f.querySelector('.result').innerHTML=msg('Saved.')}catch(err){f.querySelector('.result').innerHTML=msg(err.message,true)}})}window.newPricing=()=>{$('#view').insertAdjacentHTML('afterbegin','<form id="new-price" class="card form"><h2>New package</h2><div class="two"><input name="name" required placeholder="Package name"><input name="price" required type="number" min="0" placeholder="Price"></div><textarea name="description" placeholder="Description"></textarea><input name="criteria" placeholder="Criteria"><input name="order" type="number" value="5"><button class="btn">Add package</button><div id="new-result"></div></form>');$('#new-price').onsubmit=async e=>{e.preventDefault();try{await api('/admin/pricing',{method:'POST',body:json(Object.fromEntries(new FormData(e.target)))});pricing()}catch(err){$('#new-result').innerHTML=msg(err.message,true)}}};window.archiveRecord=async id=>{const record=(await api('/admin/pricing')).find(x=>x.id===id);await api('/admin/pricing/'+id+'/'+(record.status==='archived'?'restore':'archive'),{method:'POST',body:'{}'});pricing()};window.deleteRecord=async id=>{if(confirm('Permanently delete this package?')){await api('/admin/pricing/'+id+'?confirm=PERMANENTLY_DELETE',{method:'DELETE'});pricing()}};
-async function services(type='services'){const items=await api('/admin/'+type);$('#view').innerHTML=`<div class="bar"><h2>${type==='services'?'Services':'FAQs'}</h2><button class="btn red" onclick="newRecord('${type}')">Add</button></div><div class="grid">${items.length?items.map(x=>`<form class="card form record-form" data-id="${esc(x.id)}"><input name="${type==='services'?'name':'question'}" value="${esc(x.name||x.question)}" required><textarea name="${type==='services'?'description':'answer'}">${esc(x.description||x.answer)}</textarea><input name="order" type="number" value="${esc(x.order)}"><div class="actions"><button class="btn">Save</button><button type="button" class="btn secondary" onclick="toggleRecord('${type}','${esc(x.id)}','${x.status}')">${x.status==='archived'?'Restore':'Archive'}</button><button type="button" class="btn secondary" onclick="deleteEntity('${type}','${esc(x.id)}')">Delete</button></div><div class="result"></div></form>`).join(''):empty('No records yet.')}</div>`;document.querySelectorAll('.record-form').forEach(f=>f.onsubmit=async e=>{e.preventDefault();try{await api('/admin/'+type+'/'+f.dataset.id,{method:'PUT',body:json(Object.fromEntries(new FormData(f)))});f.querySelector('.result').innerHTML=msg('Saved.')}catch(err){f.querySelector('.result').innerHTML=msg(err.message,true)}})}window.newRecord=type=>{const fields=type==='services'?'<input name="name" required placeholder="Service name"><textarea name="description" required placeholder="Description">':'<input name="question" required placeholder="Question"><textarea name="answer" required placeholder="Answer">';$('#view').insertAdjacentHTML('afterbegin',`<form id="new-record" class="card form">${fields}<input name="order" type="number" value="1"><button class="btn">Add</button><div id="new-result"></div></form>`);$('#new-record').onsubmit=async e=>{e.preventDefault();try{await api('/admin/'+type,{method:'POST',body:json(Object.fromEntries(new FormData(e.target)))});services(type)}catch(err){$('#new-result').innerHTML=msg(err.message,true)}}};window.toggleRecord=async(type,id,status)=>{await api('/admin/'+type+'/'+id+'/'+(status==='archived'?'restore':'archive'),{method:'POST',body:'{}'});services(type)};window.deleteEntity=async(type,id)=>{if(confirm('Permanently delete this record?')){await api('/admin/'+type+'/'+id+'?confirm=PERMANENTLY_DELETE',{method:'DELETE'});services(type)}};
-async function calendar(){const [slots,bookings]=await Promise.all([api('/admin/booking_slots?status=all'),api('/admin/bookings?status=all')]);$('#view').innerHTML=`<div class="bar"><h2>Booking calendar</h2><button class="btn red" onclick="newSlot()">Create availability</button></div><div class="grid"><div class="card"><h3>Availability</h3>${slots.length?slots.map(s=>`<div class="card"><strong>${esc(new Date(s.startsAt).toLocaleString())}</strong><p class="muted">${esc(new Date(s.endsAt).toLocaleTimeString())} · ${s.available?'Available':'Booked/blocked'}</p><button class="btn secondary small" onclick="blockSlot('${esc(s.id)}',${s.available})">${s.available?'Block':'Unblock'}</button></div>`).join(''):empty('No availability yet.')}</div><div class="card"><h3>Appointments</h3>${bookings.length?bookings.map(b=>`<div class="card"><strong>${esc(new Date(b.startsAt).toLocaleString())}</strong><p>${esc(b.customerName||b.clientId||'Client')}<br>${esc(b.premises||'Premises not provided')}<br><span class="pill">${esc(b.status)}</span></p><button class="btn secondary small" onclick="cancelBooking('${esc(b.id)}')">Cancel</button></div>`).join(''):empty('No upcoming bookings.')}</div></div>`}window.newSlot=()=>{const starts=prompt('Start date/time in ISO format');const ends=prompt('End date/time in ISO format');if(starts&&ends)api('/admin/booking_slots',{method:'POST',body:json({startsAt:starts,endsAt:ends})}).then(calendar).catch(e=>alert(e.message))};window.blockSlot=async(id,available)=>{await api('/admin/booking_slots/'+id,{method:'PUT',body:json({available:!available})});calendar()};window.cancelBooking=async id=>{await api('/admin/bookings/'+id+'/cancel',{method:'POST',body:'{}'});calendar()};
-async function quotes(){const search=prompt('Search quotes (leave blank for all)')||'';const status=prompt('Status filter: all, draft, sent, viewed, accepted, declined, cancelled','all')||'all';const items=await api('/admin/quotes?search='+encodeURIComponent(search)+'&status='+encodeURIComponent(status));$('#view').innerHTML=`<div class="bar"><h2>Quotes</h2><button class="btn secondary" onclick="quotes()">Search/filter</button></div><div class="table-wrap"><table class="table"><tr><th>Quote</th><th>Customer</th><th>Price</th><th>Status</th><th>Action</th></tr>${items.length?items.map(x=>`<tr><td>${esc(x.quoteNumber)}</td><td>${esc(x.customerName||x.companyName)}</td><td>£${Number(x.total||0).toLocaleString()}</td><td><span class="pill">${esc(x.status)}</span></td><td><button class="btn small" onclick="quoteDetail('${esc(x.id)}')">Open</button></td></tr>`).join(''):'<tr><td colspan="5">No quotes yet.</td></tr>'}</table></div>`}window.quoteDetail=async id=>{const x=(await api('/admin/quotes?status=all')).find(q=>q.id===id);if(!x)return;$('#quote-detail').innerHTML=`<p><strong>${esc(x.quoteNumber)}</strong> · <span class="pill">${esc(x.status)}</span></p><p>Customer: ${esc(x.customerName)}<br>Company: ${esc(x.companyName)}<br>Premises: ${esc(x.premises?.address)} ${esc(x.premises?.postcode)}<br>Price: £${Number(x.total||0).toLocaleString()}<br>Created: ${esc(x.createdAt)}<br>Terms: ${x.status==='accepted'?'Ready for terms':'Pending acceptance'}<br>Payment: unpaid until Stripe confirms payment</p><div class="actions">${['draft','viewed','declined'].includes(x.status)?`<button class="btn" onclick="quoteAction('${x.id}','send')">Send/resend</button>`:''}${!['cancelled','accepted'].includes(x.status)?`<button class="btn red" onclick="quoteAction('${x.id}','cancel')">Cancel</button>`:''}</div>`;$('#quote-modal').classList.remove('hidden')};window.quoteAction=async(id,action)=>{await api('/admin/quotes/'+id+'/'+action,{method:'POST',body:'{}'});closeQuote();quotes()};window.closeQuote=()=>$('#quote-modal').classList.add('hidden');
-async function audit(){const rows=await api('/admin/audit-log');$('#view').innerHTML='<h2>Audit log</h2><div class="table-wrap"><table class="table"><tr><th>Time</th><th>Action</th><th>Entity</th><th>Actor</th></tr>'+rows.map(x=>`<tr><td>${esc(x.timestamp)}</td><td>${esc(x.action)}</td><td>${esc(x.entity_type)} ${esc(x.entity_id)}</td><td>${esc(x.actor_id)}</td></tr>`).join('')+'</table></div>'}
-const views={dashboard,content,pricing,services,faqs:()=>services('faqs'),calendar,quotes,audit,clients:()=>collection('clients'),actions:()=>collection('actions'),documents:()=>collection('documents'),messages:()=>collection('messages')};async function collection(type){const items=await api('/admin/'+type);$('#view').innerHTML=`<h2>${esc(type)}</h2>${items.length?'<div class="grid">'+items.map(x=>`<article class="card"><h3>${esc(x.name||x.title||x.fileName||x.id)}</h3><p class="muted">${esc(x.status)}</p><p>${esc(x.description||x.message||'')}</p></article>`).join('')+'</div>':empty('No '+type+' yet.')}}async function show(name){try{await views[name]()}catch(e){$('#view').innerHTML=msg(e.message,true)}}document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>show(b.dataset.view));$('#logout').onclick=async()=>{await api('/auth/logout',{method:'POST'});location.href='/'};show('dashboard');</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurelius Fire | Assessor CRM</title>
+
+<style>
+*{box-sizing:border-box}
+:root{
+ --red:#d71920;
+ --dark:#111827;
+ --blue:#2563eb;
+ --bg:#f4f6f8;
+ --border:#e4e8ee;
+ --muted:#697386;
+ --green:#15803d;
+ --amber:#b45309
+}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:#172033}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:255px;background:var(--dark);color:#fff;padding:22px 14px;overflow:auto;z-index:10}
+.brand{font-size:21px;font-weight:800;padding:5px 12px 25px;letter-spacing:-.4px}
+.brand span{color:#ef3340}
+.section-label{font-size:10px;text-transform:uppercase;color:#697586;padding:18px 12px 6px;font-weight:800;letter-spacing:1px}
+.nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:7px;color:#b8c0cc;text-decoration:none;margin:2px 0;font-size:14px;cursor:pointer}
+.nav a:hover,.nav a.active{background:#273244;color:#fff}
+.main{margin-left:255px;padding:28px 32px;min-height:100vh}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
+.top h1{margin:0;font-size:29px;letter-spacing:-.7px}
+.top-right{display:flex;gap:8px;align-items:center}
+.btn{border:0;border-radius:7px;padding:10px 15px;font-weight:700}
+.btn.red{background:var(--red);color:white}
+.btn.dark{background:var(--dark);color:white}
+.btn.light{background:#e9edf2;color:#172033}
+.btn.green{background:#dcfce7;color:#166534}
+.btn.small{padding:7px 10px;font-size:12px}
+.page{display:none}
+.page.active{display:block}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.stat{background:#fff;border:1px solid var(--border);border-radius:11px;padding:20px}
+.stat small{color:var(--muted);font-weight:600}
+.stat strong{display:block;font-size:30px;margin-top:7px}
+.panel{background:#fff;border:1px solid var(--border);border-radius:11px;padding:22px;margin-top:20px}
+.panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.panel h2{font-size:18px;margin:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px}
+.card h3{margin:0 0 8px;font-size:16px}
+.muted{color:var(--muted)}
+.big{font-size:26px;font-weight:800}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:12px;border-bottom:1px solid #edf0f3;font-size:13px;vertical-align:top}
+th{color:#677286;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+tr:hover td{background:#fafbfc}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d6dce5;border-radius:7px;background:white;margin:5px 0 14px}
+textarea{min-height:100px;resize:vertical}
+label{font-size:12px;font-weight:800;display:block}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.form-grid .full{grid-column:1/-1}
+.badge{display:inline-block;border-radius:20px;padding:4px 9px;font-size:11px;font-weight:800}
+.badge.new{background:#dbeafe;color:#1d4ed8}
+.badge.progress{background:#fef3c7;color:#92400e}
+.badge.complete{background:#dcfce7;color:#166534}
+.badge.high{background:#fee2e2;color:#991b1b}
+.badge.medium{background:#fef3c7;color:#92400e}
+.badge.low{background:#dcfce7;color:#166534}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px}
+.toolbar input{max-width:320px;margin:0}
+.notice{padding:13px 15px;border-radius:8px;background:#f1f5f9;margin-bottom:15px}
+.timeline{border-left:2px solid #e5e7eb;margin-left:10px;padding-left:22px}
+.timeline-item{margin-bottom:22px}
+.timeline-item strong{display:block}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modal-box{width:min(850px,100%);max-height:92vh;overflow:auto;background:white;border-radius:14px;padding:28px}
+.modal-head{display:flex;justify-content:space-between;align-items:center}
+.close{font-size:25px;cursor:pointer}
+.empty{text-align:center;padding:35px;color:var(--muted)}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.quick button{text-align:left;background:#fff;border:1px solid var(--border);border-radius:9px;padding:17px}
+.quick strong{display:block;margin-bottom:5px}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--border)}
+.calendar div{padding:12px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);min-height:75px}
+.calendar .head{min-height:auto;background:#f7f8fa;font-weight:800}
+.action-row{display:flex;justify-content:space-between;gap:15px;align-items:center}
+@media(max-width:1100px){.stats{grid-template-columns:repeat(3,1fr)}.grid4{grid-template-columns:1fr 1fr}.quick{grid-template-columns:1fr 1fr}}
+@media(max-width:800px){.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;padding:20px}.stats,.grid2,.grid3,.form-grid{grid-template-columns:1fr}.nav{display:grid;grid-template-columns:1fr 1fr}.top{gap:15px;align-items:flex-start}.calendar{overflow:auto;min-width:700px}}
+</style>
+
+<style id="crm-live-status-css">
+#crm-database-status {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  font-size:12px;
+  color:#667085;
+  margin-left:12px;
+}
+
+#crm-database-status .dot {
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#12b76a;
+  display:inline-block;
+}
+
+.crm-db-refresh {
+  border:1px solid #d0d5dd;
+  background:#fff;
+  border-radius:8px;
+  padding:8px 12px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.crm-db-refresh:hover {
+  background:#f8fafc;
+}
+</style>
+
+</head>
+
+<body>
+<div id="crm-database-status">
+  <span class="dot"></span>
+  <span>Database connected</span>
+</div>
+
+
+<aside class="sidebar">
+<div class="brand">AURELIUS <span>FIRE</span></div>
+
+<div class="section-label">CRM</div>
+<div class="nav">
+<a class="active" data-page="dashboard">▣ Dashboard</a>
+<a data-page="enquiries">◉ Enquiries</a>
+<a data-page="clients">♙ Clients</a>
+<a data-page="premises">⌂ Premises</a>
+<a data-page="quotes">£ Quotes</a>
+<a data-page="bookings">◷ Bookings</a>
+</div>
+
+<div class="section-label">Assessments</div>
+<div class="nav">
+<a data-page="assessments">✓ Assessments</a>
+<a data-page="documents">▤ Documents</a>
+<a data-page="actions">! Actions</a>
+<a data-page="certificates">▧ Certificates</a>
+<a data-page="previsit">☑ Pre-visit</a>
+</div>
+
+<div class="section-label">Communication</div>
+<div class="nav">
+<a data-page="messages">✉ Messages</a>
+<a data-page="payments">£ Payments</a>
+<a data-page="invoices">▣ Invoices</a>
+</div>
+
+<div class="section-label">Management</div>
+<div class="nav">
+<a data-page="website">✎ Website Editor</a>
+<a data-page="pricing">◇ Pricing</a>
+<a data-page="about">◎ About Me</a>
+<a data-page="availability">◷ Availability</a>
+<a data-page="terms">▤ Terms & Policies</a>
+<a data-page="users">♙ Users</a>
+<a data-page="settings">⚙ Settings</a>
+</div>
+</aside>
+
+<main class="main">
+
+<div class="top">
+<h1 id="pageTitle">Dashboard</h1>
+<div class="top-right">
+<button class="btn light" onclick="window.open('/','_blank')">View Website</button>
+<button class="btn red" onclick="newEnquiry()">+ New Enquiry</button>
+</div>
+</div>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="page active">
+
+<div class="stats">
+<div class="stat"><small>Open Enquiries</small><strong id="statEnquiries">0</strong></div>
+<div class="stat"><small>Active Clients</small><strong id="statClients">0</strong></div>
+<div class="stat"><small>Open Quotes</small><strong id="statQuotes">0</strong></div>
+<div class="stat"><small>Upcoming Bookings</small><strong id="statBookings">0</strong></div>
+<div class="stat"><small>Open Actions</small><strong id="statActions">0</strong></div>
+</div>
+
+<div class="panel">
+<div class="panel-header"><h2>Assessor workspace</h2></div>
+<div class="quick">
+<button onclick="newEnquiry()"><strong>+ New enquiry</strong><span class="muted">Add a prospective client</span></button>
+<button onclick="newClient()"><strong>+ New client</strong><span class="muted">Create client record</span></button>
+<button onclick="newQuote()"><strong>+ New quote</strong><span class="muted">Create fixed-price quote</span></button>
+<button onclick="newBooking()"><strong>+ New booking</strong><span class="muted">Schedule assessment</span></button>
+</div>
+</div>
+
+<div class="grid2">
+<div class="panel">
+<div class="panel-header"><h2>Assessment pipeline</h2></div>
+<div class="timeline">
+<div class="timeline-item"><strong>Enquiry</strong><span class="muted">Initial customer contact</span></div>
+<div class="timeline-item"><strong>Quote</strong><span class="muted">Price issued and accepted</span></div>
+<div class="timeline-item"><strong>Pre-visit</strong><span class="muted">Information and documents collected</span></div>
+<div class="timeline-item"><strong>Assessment</strong><span class="muted">Site visit completed</span></div>
+<div class="timeline-item"><strong>Report</strong><span class="muted">Final FRA uploaded</span></div>
+<div class="timeline-item"><strong>Actions</strong><span class="muted">Client manages outstanding actions</span></div>
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-header"><h2>Today's workspace</h2></div>
+<div id="todayList" class="empty">No appointments entered.</div>
+</div>
+</div>
+
+</section>
+
+<!-- ENQUIRIES -->
+<section id="enquiries" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Enquiries</h2><button class="btn red" onclick="newEnquiry()">+ Add enquiry</button></div>
+<div class="toolbar">
+<input id="enquirySearch" placeholder="Search enquiries..." oninput="renderEnquiries()">
+<select id="enquiryStatus" onchange="renderEnquiries()">
+<option value="">All statuses</option><option>New</option><option>Contacted</option><option>Quoted</option><option>Won</option><option>Lost</option>
+</select>
+</div>
+<table><thead><tr><th>Client</th><th>Business</th><th>Premises</th><th>Status</th><th>Date</th><th></th></tr></thead>
+<tbody id="enquiryTable"></tbody></table>
+</div>
+</section>
+
+<!-- CLIENTS -->
+<section id="clients" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Clients</h2><button class="btn red" onclick="newClient()">+ Add client</button></div>
+<div class="toolbar"><input id="clientSearch" placeholder="Search clients..." oninput="renderClients()"></div>
+<table><thead><tr><th>Client</th><th>Business</th><th>Email</th><th>Phone</th><th>Status</th><th></th></tr></thead>
+<tbody id="clientTable"></tbody></table>
+</div>
+</section>
+
+<!-- PREMISES -->
+<section id="premises" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Premises</h2><button class="btn red" onclick="newPremises()">+ Add premises</button></div>
+<table><thead><tr><th>Premises</th><th>Client</th><th>Type</th><th>Floors</th><th>Assessment</th><th></th></tr></thead>
+<tbody id="premisesTable"></tbody></table>
+</div>
+</section>
+
+<!-- QUOTES -->
+<section id="quotes" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Quotes</h2><button class="btn red" onclick="newQuote()">+ Create quote</button></div>
+<table><thead><tr><th>Quote</th><th>Client</th><th>Assessment</th><th>Value</th><th>Status</th><th></th></tr></thead>
+<tbody id="quoteTable"></tbody></table>
+</div>
+</section>
+
+<!-- BOOKINGS -->
+<section id="bookings" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Bookings & Calendar</h2><button class="btn red" onclick="newBooking()">+ New booking</button></div>
+<div class="calendar">
+<div class="head">Mon</div><div class="head">Tue</div><div class="head">Wed</div><div class="head">Thu</div><div class="head">Fri</div><div class="head">Sat</div><div class="head">Sun</div>
+<div>1</div><div>2</div><div>3</div><div>4</div><div><b>5</b><br><small>Available</small></div><div><b>6</b><br><small>Available</small></div><div><b>7</b></div>
+<div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div>
+<div>15</div><div>16</div><div>17</div><div>18</div><div>19</div><div>20</div><div>21</div>
+<div>22</div><div>23</div><div>24</div><div>25</div><div>26</div><div>27</div><div>28</div>
+</div>
+</div>
+<div class="panel">
+<h2>Upcoming bookings</h2>
+<table><thead><tr><th>Date</th><th>Time</th><th>Client</th><th>Premises</th><th>Status</th></tr></thead>
+<tbody id="bookingTable"></tbody></table>
+</div>
+</section>
+
+<!-- ASSESSMENTS -->
+<section id="assessments" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Assessments</h2><button class="btn red" onclick="newAssessment()">+ New assessment</button></div>
+<table><thead><tr><th>Reference</th><th>Client</th><th>Premises</th><th>Type</th><th>Stage</th><th>Due</th><th></th></tr></thead>
+<tbody id="assessmentTable"></tbody></table>
+</div>
+</section>
+
+<!-- DOCUMENTS -->
+<section id="documents" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Documents & FRA Reports</h2><button class="btn red" onclick="newDocument()">+ Upload document</button></div>
+<div class="notice">Completed FRA reports, supporting certificates and client documents can be managed from this area.</div>
+<table><thead><tr><th>Document</th><th>Client</th><th>Type</th><th>Date</th><th>Visibility</th><th></th></tr></thead>
+<tbody id="documentTable"></tbody></table>
+</div>
+</section>
+
+<!-- ACTIONS -->
+<section id="actions" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Actions Register</h2><button class="btn red" onclick="newAction()">+ Add action</button></div>
+<div class="toolbar">
+<select id="actionFilter" onchange="renderActions()"><option value="">All priorities</option><option>High</option><option>Medium</option><option>Low</option></select>
+<select id="actionStatus" onchange="renderActions()"><option value="">All statuses</option><option>Open</option><option>In Progress</option><option>Complete</option></select>
+</div>
+<table><thead><tr><th>Action</th><th>Client</th><th>Priority</th><th>Timescale</th><th>Responsible</th><th>Status</th><th></th></tr></thead>
+<tbody id="actionTable"></tbody></table>
+</div>
+</section>
+
+<!-- CERTIFICATES -->
+<section id="certificates" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Certificates & Compliance</h2><button class="btn red" onclick="newCertificate()">+ Add certificate</button></div>
+<table><thead><tr><th>Certificate</th><th>Client</th><th>Type</th><th>Issue</th><th>Expiry</th><th>Status</th></tr></thead>
+<tbody id="certificateTable"></tbody></table>
+</div>
+</section>
+
+<!-- PREVISIT -->
+<section id="previsit" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Pre-visit Information</h2></div>
+<div class="grid3">
+<div class="card"><h3>Premises details</h3><p class="muted">Floors, use, occupancy, construction and access.</p></div>
+<div class="card"><h3>Fire safety systems</h3><p class="muted">Alarm, emergency lighting, extinguishers and signage.</p></div>
+<div class="card"><h3>Supporting documents</h3><p class="muted">EICR, gas certification, servicing and other relevant records.</p></div>
+</div>
+<div class="panel">
+<h2>Pre-visit checklist</h2>
+<table><thead><tr><th>Requirement</th><th>Status</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Premises information received</td><td><span class="badge new">Pending</span></td><td></td></tr>
+<tr><td>Existing FRA received</td><td><span class="badge new">Pending</span></td><td></td></tr>
+<tr><td>Fire alarm information</td><td><span class="badge new">Pending</span></td><td></td></tr>
+<tr><td>Emergency lighting information</td><td><span class="badge new">Pending</span></td><td></td></tr>
+<tr><td>Relevant certificates</td><td><span class="badge new">Pending</span></td><td></td></tr>
+</tbody></table>
+</div>
+</section>
+
+<!-- MESSAGES -->
+<section id="messages" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Client Messages</h2><button class="btn red">+ New message</button></div>
+<div class="empty">Client conversations will appear here.</div>
+</div>
+</section>
+
+<!-- PAYMENTS -->
+<section id="payments" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Payments</h2></div>
+<table><thead><tr><th>Client</th><th>Reference</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+<tbody id="paymentTable"></tbody></table>
+</div>
+</section>
+
+<!-- INVOICES -->
+<section id="invoices" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Invoices</h2><button class="btn red">+ Create invoice</button></div>
+<table><thead><tr><th>Invoice</th><th>Client</th><th>Amount</th><th>Issued</th><th>Due</th><th>Status</th></tr></thead>
+<tbody id="invoiceTable"></tbody></table>
+</div>
+</section>
+
+<!-- WEBSITE -->
+<section id="website" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Website Editor</h2><button class="btn red" onclick="saveSettings('website')">Save changes</button></div>
+<div class="form-grid">
+<div><label>Business name</label><input id="webName" value="Aurelius Fire"></div>
+<div><label>Homepage headline</label><input id="webHeadline" value="Fire safety made clear."></div>
+<div class="full"><label>Homepage introduction</label><textarea id="webIntro">Professional fire risk assessments for commercial premises. Practical, proportionate and focused on life safety.</textarea></div>
+<div class="full"><label>About text</label><textarea id="webAbout">Independent fire risk assessment services focused on practical compliance and life safety.</textarea></div>
+<div><label>Contact email</label><input id="webEmail"></div>
+<div><label>Contact phone</label><input id="webPhone"></div>
+</div>
+</div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Pricing Management</h2><button class="btn red" onclick="savePricing()">Save pricing</button></div>
+<div class="grid4">
+<div class="card"><label>Small</label><input id="priceSmall" value="345"><small>One floor</small></div>
+<div class="card"><label>Standard</label><input id="priceStandard" value="495"><small>Two floors</small></div>
+<div class="card"><label>Larger</label><input id="priceLarger" value="695"><small>Three floors / larger</small></div>
+<div class="card"><label>Complex</label><input id="priceComplex" value="995"><small>Four+ floors / complex</small></div>
+</div>
+</div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="page">
+<div class="panel">
+<div class="panel-header"><h2>About Me</h2><button class="btn red" onclick="saveAbout()">Save profile</button></div>
+<div class="form-grid">
+<div><label>Your name</label><input id="aboutName" value="Aurelius Fire"></div>
+<div><label>Professional title</label><input id="aboutTitle" value="Fire Risk Assessor"></div>
+<div class="full"><label>Biography</label><textarea id="aboutBio">Independent fire risk assessor providing practical commercial fire safety assessments.</textarea></div>
+<div class="full"><label>Profile photo</label><input type="file" accept="image/*"></div>
+</div>
+</div>
+</section>
+
+<!-- AVAILABILITY -->
+<section id="availability" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Assessment Availability</h2><button class="btn red">Save availability</button></div>
+<div class="grid3">
+<div class="card"><h3>Friday</h3><label><input type="checkbox" checked> Available</label><input value="17:00"> <input value="21:00"></div>
+<div class="card"><h3>Saturday</h3><label><input type="checkbox" checked> Available</label><input value="09:00"> <input value="17:00"></div>
+<div class="card"><h3>Sunday</h3><label><input type="checkbox" checked> Available</label><input value="09:00"> <input value="17:00"></div>
+</div>
+<p class="muted">Booking window: up to 90 days. Assessment duration can be configured per booking.</p>
+</div>
+</section>
+
+<!-- TERMS -->
+<section id="terms" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Terms & Policies</h2><button class="btn red">Save policies</button></div>
+<div class="form-grid">
+<div class="full"><label>Client engagement terms</label><textarea rows="10">Aurelius Fire provides fire risk assessment services in accordance with the agreed scope of work. The responsible person retains responsibility for fire safety arrangements and implementation of recommendations.</textarea></div>
+<div class="full"><label>Privacy policy</label><textarea rows="8">Personal information is used for the purpose of providing services, managing enquiries, assessments, payments and client communications.</textarea></div>
+<div class="full"><label>Cancellation policy</label><textarea rows="6">Cancellation arrangements are confirmed within the accepted engagement terms.</textarea></div>
+</div>
+</div>
+</section>
+
+<!-- USERS -->
+<section id="users" class="page">
+<div class="panel">
+<div class="panel-header"><h2>Users & Access</h2><button class="btn red">+ Invite user</button></div>
+<table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last login</th><th></th></tr></thead>
+<tbody><tr><td>Administrator</td><td>Admin</td><td>Assessor / Admin</td><td><span class="badge complete">Active</span></td><td>Current</td><td><button class="btn light small">Edit</button></td></tr></tbody>
+</table>
+</div>
+</section>
+
+<!-- SETTINGS -->
+<section id="settings" class="page">
+<div class="panel">
+<div class="panel-header"><h2>System Settings</h2><button class="btn red">Save settings</button></div>
+<div class="form-grid">
+<div><label>Business name</label><input value="Aurelius Fire"></div>
+<div><label>Currency</label><select><option>GBP (£)</option></select></div>
+<div><label>Default assessment duration</label><select><option>90 minutes</option><option>120 minutes</option><option>180 minutes</option></select></div>
+<div><label>Booking window</label><select><option>90 days</option></select></div>
+<div class="full"><label>Default email footer</label><textarea>Aurelius Fire — Independent Fire Risk Assessment Services</textarea></div>
+</div>
+</div>
+</section>
+
+</main>
+
+<!-- UNIVERSAL MODAL -->
+<div class="modal" id="modal">
+<div class="modal-box">
+<div class="modal-head"><h2 id="modalTitle">New record</h2><span class="close" onclick="closeModal()">×</span></div>
+<div id="modalBody"></div>
+</div>
+</div>
+
+
+
+<script>
+/* ==========================================
+   AURELIUS STORAGE BRIDGE
+   Existing CRM UI can continue using
+   localStorage-style functions while the
+   database becomes the source of truth.
+   ========================================== */
+
+(function() {
+  const originalSetItem = localStorage.setItem.bind(localStorage);
+
+  window.__aureliusLocalStorageWrites = [];
+
+  localStorage.setItem = function(key, value) {
+    originalSetItem(key, value);
+
+    if (
+      key.startsWith('aurelius_') ||
+      key.startsWith('crm_')
+    ) {
+      window.__aureliusLocalStorageWrites.push({
+        key,
+        value,
+        timestamp: Date.now()
+      });
+    }
+  };
+
+  window.crmPersist = async function(type, record) {
+    if (!record) return null;
+
+    const id = record.id || null;
+
+    return await saveCRMRecord(
+      type,
+      record,
+      id
+    );
+  };
+
+  window.crmArchive = async function(record) {
+    if (!record || !record.id) return;
+    return await archiveCRMRecord(record.id);
+  };
+})();
+</script>
+
+<script>
+/* ==========================================
+   AURELIUS CRM LIVE DATABASE CONNECTION
+   ========================================== */
+
+const CRM_API = '/api/admin/crm';
+
+async function crmRequest(url, options = {}) {
+  const config = {
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    },
+    ...options
+  };
+
+  const response = await fetch(CRM_API + url, config);
+
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error('Server returned an invalid response');
+  }
+
+  if (!response.ok || data.success === false) {
+    throw new Error(data.error || 'CRM request failed');
+  }
+
+  return data;
+}
+
+async function crmLoad(type) {
+  const result = await crmRequest('/entities/' + encodeURIComponent(type));
+  return result.data || [];
+}
+
+async function crmGet(id) {
+  const result = await crmRequest('/entity/' + encodeURIComponent(id));
+  return result.data;
+}
+
+async function crmCreate(type, data) {
+  const result = await crmRequest('/entities/' + encodeURIComponent(type), {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+
+  return result.data;
+}
+
+async function crmUpdate(id, data) {
+  const result = await crmRequest('/entity/' + encodeURIComponent(id), {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+
+  return result.data;
+}
+
+async function crmDelete(id) {
+  const result = await crmRequest('/entity/' + encodeURIComponent(id), {
+    method: 'DELETE'
+  });
+
+  return result.data;
+}
+
+async function crmSearch(term) {
+  const result = await crmRequest('/search?q=' + encodeURIComponent(term));
+  return result.data || [];
+}
+
+async function crmSummary() {
+  const result = await crmRequest('/summary');
+  return result;
+}
+
+async function crmContent() {
+  const result = await crmRequest('/content');
+  return result.data || [];
+}
+
+async function crmSaveContent(key, value) {
+  const result = await crmRequest('/content/' + encodeURIComponent(key), {
+    method: 'PUT',
+    body: JSON.stringify({ value })
+  });
+
+  return result;
+}
+
+/* ------------------------------------------
+   DATABASE-BACKED STORAGE COMPATIBILITY
+   ------------------------------------------ */
+
+window.AureliusCRM = {
+  api: CRM_API,
+  request: crmRequest,
+  load: crmLoad,
+  get: crmGet,
+  create: crmCreate,
+  update: crmUpdate,
+  remove: crmDelete,
+  search: crmSearch,
+  summary: crmSummary,
+  content: crmContent,
+  saveContent: crmSaveContent
+};
+
+/* ------------------------------------------
+   LIVE CRM DATA
+   ------------------------------------------ */
+
+window.crmLiveData = {
+  enquiries: [],
+  clients: [],
+  premises: [],
+  quotes: [],
+  bookings: [],
+  assessments: [],
+  documents: [],
+  actions: [],
+  certificates: [],
+  previsit: [],
+  messages: [],
+  payments: [],
+  invoices: []
+};
+
+window.crmTypes = [
+  'enquiry',
+  'client',
+  'premises',
+  'quote',
+  'booking',
+  'assessment',
+  'document',
+  'action',
+  'certificate',
+  'previsit',
+  'message',
+  'payment',
+  'invoice'
+];
+
+async function loadAllCRMData() {
+  const results = await Promise.all(
+    window.crmTypes.map(async type => {
+      try {
+        return [type, await crmLoad(type)];
+      } catch (error) {
+        console.error('CRM load failed:', type, error);
+        return [type, []];
+      }
+    })
+  );
+
+  for (const [type, data] of results) {
+    window.crmLiveData[type + 's'] = data;
+  }
+
+  window.dispatchEvent(new CustomEvent('aurelius-crm-loaded', {
+    detail: window.crmLiveData
+  }));
+
+  return window.crmLiveData;
+}
+
+async function refreshCRM() {
+  try {
+    await loadAllCRMData();
+
+    if (typeof renderAll === 'function') {
+      renderAll();
+    }
+
+    if (typeof renderDashboard === 'function') {
+      renderDashboard();
+    }
+
+    if (typeof renderCurrentView === 'function') {
+      renderCurrentView();
+    }
+
+    showCRMToast('CRM data refreshed');
+  } catch (error) {
+    console.error(error);
+    showCRMToast('Unable to refresh CRM data', true);
+  }
+}
+
+function showCRMToast(message, error = false) {
+  let toast = document.getElementById('crm-live-toast');
+
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'crm-live-toast';
+
+    toast.style.cssText = `
+      position:fixed;
+      right:24px;
+      bottom:24px;
+      z-index:99999;
+      padding:13px 18px;
+      border-radius:10px;
+      color:white;
+      font-size:14px;
+      font-weight:600;
+      box-shadow:0 10px 30px rgba(0,0,0,.18);
+      transition:opacity .25s ease;
+    `;
+
+    document.body.appendChild(toast);
+  }
+
+  toast.style.background = error ? '#b42318' : '#1769aa';
+  toast.textContent = message;
+  toast.style.opacity = '1';
+
+  clearTimeout(window.__crmToastTimer);
+
+  window.__crmToastTimer = setTimeout(() => {
+    toast.style.opacity = '0';
+  }, 2200);
+}
+
+/* ------------------------------------------
+   DATABASE SAVE HELPERS
+   ------------------------------------------ */
+
+async function saveCRMRecord(type, data, existingId = null) {
+  try {
+    const saved = existingId
+      ? await crmUpdate(existingId, data)
+      : await crmCreate(type, data);
+
+    await loadAllCRMData();
+
+    showCRMToast(existingId ? 'Record updated' : 'Record created');
+
+    return saved;
+  } catch (error) {
+    console.error(error);
+    showCRMToast(error.message || 'Unable to save record', true);
+    throw error;
+  }
+}
+
+async function archiveCRMRecord(id) {
+  try {
+    await crmDelete(id);
+    await loadAllCRMData();
+    showCRMToast('Record archived');
+  } catch (error) {
+    console.error(error);
+    showCRMToast(error.message || 'Unable to archive record', true);
+    throw error;
+  }
+}
+
+/* ------------------------------------------
+   AUTO REFRESH
+   ------------------------------------------ */
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    loadAllCRMData().catch(console.error);
+  }, 250);
+});
+</script>
+
+<script>
+const state={
+ enquiries:JSON.parse(localStorage.getItem('af_enquiries')||'[]'),
+ clients:JSON.parse(localStorage.getItem('af_clients')||'[]'),
+ premises:JSON.parse(localStorage.getItem('af_premises')||'[]'),
+ quotes:JSON.parse(localStorage.getItem('af_quotes')||'[]'),
+ bookings:JSON.parse(localStorage.getItem('af_bookings')||'[]'),
+ assessments:JSON.parse(localStorage.getItem('af_assessments')||'[]'),
+ documents:JSON.parse(localStorage.getItem('af_documents')||'[]'),
+ actions:JSON.parse(localStorage.getItem('af_actions')||'[]'),
+ certificates:JSON.parse(localStorage.getItem('af_certificates')||'[]')
+};
+
+function save(k){localStorage.setItem('af_'+k,JSON.stringify(state[k]))}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function id(){return Date.now().toString(36)}
+function badge(s){
+const x=String(s||'New').toLowerCase().replace(/\s/g,'');
+let c=x.includes('complete')||x==='won'||x==='paid'?'complete':x.includes('progress')||x==='quoted'||x==='accepted'?'progress':'new';
+return `<span class="badge ${c}">${esc(s||'New')}</span>`
+}
+
+document.querySelectorAll('.nav a').forEach(a=>{
+a.onclick=()=>{
+document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));
+a.classList.add('active');
+showPage(a.dataset.page);
+}
+});
+
+function showPage(p){
+document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+document.getElementById(p).classList.add('active');
+document.getElementById('pageTitle').textContent=document.querySelector(`[data-page="${p}"]`).textContent.replace(/^[^\w]+/,'');
+renderAll();
+}
+
+function renderAll(){
+document.getElementById('statEnquiries').textContent=state.enquiries.length;
+document.getElementById('statClients').textContent=state.clients.length;
+document.getElementById('statQuotes').textContent=state.quotes.filter(x=>x.status!=='Accepted').length;
+document.getElementById('statBookings').textContent=state.bookings.length;
+document.getElementById('statActions').textContent=state.actions.filter(x=>x.status!=='Complete').length;
+
+renderEnquiries();renderClients();renderPremises();renderQuotes();renderBookings();renderAssessments();renderDocuments();renderActions();renderCertificates();renderPayments();renderInvoices();
+}
+
+function renderEnquiries(){
+const q=(document.getElementById('enquirySearch')?.value||'').toLowerCase();
+const s=document.getElementById('enquiryStatus')?.value||'';
+const rows=state.enquiries.filter(x=>(!q||JSON.stringify(x).toLowerCase().includes(q))&&(!s||x.status===s));
+document.getElementById('enquiryTable').innerHTML=rows.length?rows.map(x=>`<tr>
+<td><b>${esc(x.name)}</b><br><span class="muted">${esc(x.email)}</span></td>
+<td>${esc(x.business)}</td><td>${esc(x.address)}</td><td>${badge(x.status)}</td><td>${esc(x.date)}</td>
+<td><button class="btn light small" onclick="editRecord('enquiries','${x.id}')">Open</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No enquiries.</td></tr>';
+}
+
+function renderClients(){
+const q=(document.getElementById('clientSearch')?.value||'').toLowerCase();
+const rows=state.clients.filter(x=>JSON.stringify(x).toLowerCase().includes(q));
+document.getElementById('clientTable').innerHTML=rows.length?rows.map(x=>`<tr>
+<td><b>${esc(x.name)}</b></td><td>${esc(x.business)}</td><td>${esc(x.email)}</td><td>${esc(x.phone)}</td><td>${badge(x.status)}</td>
+<td><button class="btn light small" onclick="editRecord('clients','${x.id}')">Open</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No clients.</td></tr>';
+}
+
+function renderPremises(){
+document.getElementById('premisesTable').innerHTML=state.premises.length?state.premises.map(x=>`<tr><td><b>${esc(x.name)}</b><br>${esc(x.address)}</td><td>${esc(x.client)}</td><td>${esc(x.type)}</td><td>${esc(x.floors)}</td><td>${badge(x.assessment)}</td><td><button class="btn light small" onclick="editRecord('premises','${x.id}')">Open</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No premises.</td></tr>';
+}
+
+function renderQuotes(){
+document.getElementById('quoteTable').innerHTML=state.quotes.length?state.quotes.map(x=>`<tr><td><b>${esc(x.ref)}</b></td><td>${esc(x.client)}</td><td>${esc(x.type)}</td><td><b>£${esc(x.amount)}</b></td><td>${badge(x.status)}</td><td><button class="btn light small" onclick="editRecord('quotes','${x.id}')">Open</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No quotes.</td></tr>';
+}
+
+function renderBookings(){
+document.getElementById('bookingTable').innerHTML=state.bookings.length?state.bookings.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.time)}</td><td>${esc(x.client)}</td><td>${esc(x.premises)}</td><td>${badge(x.status)}</td></tr>`).join(''):'<tr><td colspan="5" class="empty">No bookings.</td></tr>';
+}
+
+function renderAssessments(){
+document.getElementById('assessmentTable').innerHTML=state.assessments.length?state.assessments.map(x=>`<tr><td><b>${esc(x.ref)}</b></td><td>${esc(x.client)}</td><td>${esc(x.premises)}</td><td>${esc(x.type)}</td><td>${badge(x.stage)}</td><td>${esc(x.due)}</td><td><button class="btn light small" onclick="editRecord('assessments','${x.id}')">Open</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No assessments.</td></tr>';
+}
+
+function renderDocuments(){
+document.getElementById('documentTable').innerHTML=state.documents.length?state.documents.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.client)}</td><td>${esc(x.type)}</td><td>${esc(x.date)}</td><td>${badge(x.visibility)}</td><td><button class="btn light small">Open</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No documents.</td></tr>';
+}
+
+function renderActions(){
+const p=document.getElementById('actionFilter')?.value||'';
+const s=document.getElementById('actionStatus')?.value||'';
+const rows=state.actions.filter(x=>(!p||x.priority===p)&&(!s||x.status===s));
+document.getElementById('actionTable').innerHTML=rows.length?rows.map(x=>`<tr><td><b>${esc(x.action)}</b></td><td>${esc(x.client)}</td><td>${badge(x.priority)}</td><td>${esc(x.timescale)}</td><td>${esc(x.responsible)}</td><td>${badge(x.status)}</td><td><button class="btn light small" onclick="editRecord('actions','${x.id}')">Open</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No actions.</td></tr>';
+}
+
+function renderCertificates(){
+document.getElementById('certificateTable').innerHTML=state.certificates.length?state.certificates.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.client)}</td><td>${esc(x.type)}</td><td>${esc(x.issue)}</td><td>${esc(x.expiry)}</td><td>${badge(x.status)}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">No certificates.</td></tr>';
+}
+
+function renderPayments(){
+document.getElementById('paymentTable').innerHTML='<tr><td colspan="5" class="empty">Payment records will appear when payments are connected.</td></tr>';
+}
+function renderInvoices(){
+document.getElementById('invoiceTable').innerHTML='<tr><td colspan="6" class="empty">Invoice records will appear here.</td></tr>';
+}
+
+function openModal(title,body){
+document.getElementById('modalTitle').textContent=title;
+document.getElementById('modalBody').innerHTML=body;
+document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+
+function form(type,x={}){
+const e=type==='enquiries';
+if(type==='enquiries')return `
+<label>Name</label><input id="f_name" value="${esc(x.name)}">
+<label>Email</label><input id="f_email" value="${esc(x.email)}">
+<label>Phone</label><input id="f_phone" value="${esc(x.phone)}">
+<label>Business</label><input id="f_business" value="${esc(x.business)}">
+<label>Premises address</label><textarea id="f_address">${esc(x.address)}</textarea>
+<label>Premises type</label><input id="f_type" value="${esc(x.type)}">
+<label>Floors</label><input id="f_floors" value="${esc(x.floors||1)}">
+<label>Status</label><select id="f_status">${['New','Contacted','Quoted','Won','Lost'].map(v=>`<option ${x.status===v?'selected':''}>${v}</option>`).join('')}</select>
+<button class="btn red" onclick="saveRecord('enquiries','${x.id||''}')">Save enquiry</button>`;
+
+if(type==='clients')return `
+<div class="form-grid">
+<div><label>Name</label><input id="f_name" value="${esc(x.name)}"></div>
+<div><label>Email</label><input id="f_email" value="${esc(x.email)}"></div>
+<div><label>Phone</label><input id="f_phone" value="${esc(x.phone)}"></div>
+<div><label>Business</label><input id="f_business" value="${esc(x.business)}"></div>
+<div class="full"><label>Address</label><textarea id="f_address">${esc(x.address)}</textarea></div>
+<div><label>Status</label><select id="f_status"><option>Active</option><option>Archived</option></select></div>
+</div><button class="btn red" onclick="saveRecord('clients','${x.id||''}')">Save client</button>`;
+
+if(type==='premises')return `
+<label>Premises name</label><input id="f_name" value="${esc(x.name)}">
+<label>Client</label><input id="f_client" value="${esc(x.client)}">
+<label>Address</label><textarea id="f_address">${esc(x.address)}</textarea>
+<label>Premises type</label><input id="f_type" value="${esc(x.type)}">
+<label>Floors</label><input id="f_floors" value="${esc(x.floors||1)}">
+<label>Assessment status</label><select id="f_assessment"><option>Not started</option><option>Booked</option><option>Complete</option></select>
+<button class="btn red" onclick="saveRecord('premises','${x.id||''}')">Save premises</button>`;
+
+if(type==='quotes')return `
+<label>Quote reference</label><input id="f_ref" value="${esc(x.ref||'Q-'+new Date().getFullYear()+'-001')}">
+<label>Client</label><input id="f_client" value="${esc(x.client)}">
+<label>Assessment type</label><select id="f_type"><option>Small - Type 1</option><option>Standard - Type 1</option><option>Larger - Type 1</option><option>Complex - Type 1</option></select>
+<label>Amount (£)</label><input id="f_amount" type="number" value="${esc(x.amount||345)}">
+<label>Status</label><select id="f_status"><option>Draft</option><option>Sent</option><option>Accepted</option><option>Declined</option></select>
+<button class="btn red" onclick="saveRecord('quotes','${x.id||''}')">Save quote</button>`;
+
+if(type==='bookings')return `
+<label>Date</label><input id="f_date" type="date" value="${esc(x.date)}">
+<label>Time</label><input id="f_time" type="time" value="${esc(x.time)}">
+<label>Client</label><input id="f_client" value="${esc(x.client)}">
+<label>Premises</label><input id="f_premises" value="${esc(x.premises)}">
+<label>Status</label><select id="f_status"><option>Booked</option><option>Confirmed</option><option>Complete</option><option>Cancelled</option></select>
+<button class="btn red" onclick="saveRecord('bookings','${x.id||''}')">Save booking</button>`;
+
+if(type==='assessments')return `
+<label>Reference</label><input id="f_ref" value="${esc(x.ref||'FRA-'+Date.now())}">
+<label>Client</label><input id="f_client" value="${esc(x.client)}">
+<label>Premises</label><input id="f_premises" value="${esc(x.premises)}">
+<label>Assessment type</label><select id="f_type"><option>Type 1 - Non-intrusive</option><option>Review</option></select>
+<label>Stage</label><select id="f_stage"><option>Booked</option><option>Pre-visit</option><option>Site visit</option><option>Report</option><option>Complete</option></select>
+<label>Due date</label><input id="f_due" type="date" value="${esc(x.due)}">
+<button class="btn red" onclick="saveRecord('assessments','${x.id||''}')">Save assessment</button>`;
+
+if(type==='actions')return `
+<label>Action</label><textarea id="f_action">${esc(x.action)}</textarea>
+<label>Client</label><input id="f_client" value="${esc(x.client)}">
+<label>Priority</label><select id="f_priority"><option>High</option><option>Medium</option><option>Low</option></select>
+<label>Timescale</label><select id="f_timescale"><option>0–1 month</option><option>3 months</option><option>6 months</option><option>12 months</option></select>
+<label>Responsible person</label><input id="f_responsible" value="${esc(x.responsible)}">
+<label>Status</label><select id="f_status"><option>Open</option><option>In Progress</option><option>Complete</option></select>
+<button class="btn red" onclick="saveRecord('actions','${x.id||''}')">Save action</button>`;
+
+if(type==='documents')return `
+<label>Document name</label><input id="f_name">
+<label>Client</label><input id="f_client">
+<label>Document type</label><select id="f_type"><option>Final FRA</option><option>EICR</option><option>Gas certificate</option><option>Fire alarm service</option><option>Emergency lighting</option><option>Other</option></select>
+<label>File</label><input id="f_file" type="file">
+<label>Visibility</label><select id="f_visibility"><option>Client</option><option>Internal</option></select>
+<button class="btn red" onclick="saveRecord('documents','')">Add document</button>`;
+
+if(type==='certificates')return `
+<label>Certificate</label><input id="f_name">
+<label>Client</label><input id="f_client">
+<label>Type</label><input id="f_type">
+<label>Issue date</label><input id="f_issue" type="date">
+<label>Expiry date</label><input id="f_expiry" type="date">
+<label>Status</label><select id="f_status"><option>Valid</option><option>Expiring</option><option>Expired</option></select>
+<button class="btn red" onclick="saveRecord('certificates','')">Save certificate</button>`;
+}
+
+function readForm(type,x){
+let o={id:x?.id||id(),date:x?.date||new Date().toLocaleDateString('en-GB')};
+['name','email','phone','business','address','type','floors','status','client','ref','amount','assessment','date','time','premises','stage','due','action','priority','timescale','responsible','visibility','issue','expiry'].forEach(k=>{
+const el=document.getElementById('f_'+k);if(el)o[k]=el.value;
+});
+return o;
+}
+
+function saveRecord(type,existing){
+let index=state[type].findIndex(x=>x.id===existing);
+let old=index>=0?state[type][index]:{};
+let obj=readForm(type,old);
+if(type==='documents'&&!obj.name)obj.name='Uploaded document';
+if(index>=0)state[type][index]=obj;else state[type].push(obj);
+save(type);closeModal();renderAll();
+}
+
+function editRecord(type,key){
+const x=state[type].find(v=>v.id===key);
+if(!x)return;
+openModal('Edit '+type.slice(0,-1),form(type,x));
+}
+
+function newEnquiry(){openModal('New enquiry',form('enquiries'))}
+function newClient(){openModal('New client',form('clients'))}
+function newPremises(){openModal('New premises',form('premises'))}
+function newQuote(){openModal('New quote',form('quotes'))}
+function newBooking(){openModal('New booking',form('bookings'))}
+function newAssessment(){openModal('New assessment',form('assessments'))}
+function newDocument(){openModal('Upload document',form('documents'))}
+function newAction(){openModal('New action',form('actions'))}
+function newCertificate(){openModal('New certificate',form('certificates'))}
+
+function savePricing(){
+localStorage.setItem('af_pricing',JSON.stringify({
+small:document.getElementById('priceSmall').value,
+standard:document.getElementById('priceStandard').value,
+larger:document.getElementById('priceLarger').value,
+complex:document.getElementById('priceComplex').value
+}));
+alert('Pricing saved.');
+}
+function saveAbout(){localStorage.setItem('af_about',JSON.stringify({name:aboutName.value,title:aboutTitle.value,bio:aboutBio.value}));alert('About Me saved.')}
+function saveSettings(x){localStorage.setItem('af_website',JSON.stringify({name:webName.value,headline:webHeadline.value,intro:webIntro.value,about:webAbout.value,email:webEmail.value,phone:webPhone.value}));alert('Website settings saved.')}
+
+renderAll();
+</script>
+
+</body>
+</html>

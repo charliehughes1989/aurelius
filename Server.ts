@@ -1,4 +1,7 @@
 import express from 'express';
+import crmBackend from './CRMBackend.ts';
+import clientJourney from './ClientJourney.ts';
+import paymentBooking from './PaymentBooking.ts';
 import cors from 'cors';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -7,6 +10,10 @@ import adminRoutes from './Admin.ts';
 import { authRequired, clearSession, createUser, login, removeSession, setSession } from './auth.ts';
 import { db, enqueueNotification, getEntity, listEntities, now, saveEntity, writeAudit } from './database.ts';
 import { createCheckout, handleStripeWebhook } from './stripe.ts';
+import documentsActions from './DocumentsActions.ts';
+import onboardingAutomation from './OnboardingAutomation.ts';
+import fileUploads from './FileUploads.ts';
+import stripeCheckout from './StripeCheckout.ts';
 
 const app = express();
 const publicDir = path.join(process.cwd(), 'public');
@@ -194,6 +201,13 @@ portal.get('/documents/:id/download', (req, res) => {
   res.download(path.join(uploadDir, document.storageName), document.fileName);
 });
 app.use('/api/portal', portal);
+app.use('/api/admin/crm', crmBackend);
+app.use('/api/client-journey', clientJourney);
+app.use('/api/payment-booking', paymentBooking);
+app.use('/api/documents-actions', documentsActions);
+app.use('/api/file-uploads', fileUploads);
+app.use('/api/stripe-checkout', stripeCheckout);
+app.use('/api/onboarding-automation', onboardingAutomation);
 
 app.get('/', (_req, res) => {
   let html = fs.readFileSync(path.join(publicDir, 'index.html'), 'utf8');
@@ -234,5 +248,55 @@ function ensureConfiguredRecords() {
   for (const [key, value] of Object.entries(policies)) if (!db.query('SELECT key FROM content WHERE key=?').get(key)) db.query('INSERT INTO content (key,value_json,published,updated_at) VALUES (?,?,1,?)').run(key, JSON.stringify(value), now());
 }
 ensureConfiguredRecords();
+
+app.get('/client', (_req, res) => {
+  res.sendFile(process.cwd() + '/public/client.html');
+});
+
+
+app.get('/booking-manager', (_req, res) => {
+  res.sendFile(process.cwd() + '/public/booking-manager.html');
+});
+
+
+app.get('/documents-manager', (_req, res) => {
+  res.sendFile(process.cwd() + '/public/documents-manager.html');
+});
+
+
+app.get('/onboarding-manager', (_req, res) => {
+  res.sendFile(process.cwd() + '/public/onboarding-manager.html');
+});
+
+
+app.get('/workflow-manager', (_req, res) => {
+  res.sendFile(process.cwd() + '/public/workflow-manager.html');
+});
+
+
+app.get('/privacy', (_req, res) => {
+  res.sendFile(process.cwd() + '/public/privacy.html');
+});
+
+app.get('/terms', (_req, res) => {
+  res.sendFile(process.cwd() + '/public/terms.html');
+});
+
+app.get('/cookies', (_req, res) => {
+  res.sendFile(process.cwd() + '/public/cookies.html');
+});
+
+app.get('/contact', (_req, res) => {
+  res.sendFile(process.cwd() + '/public/contact.html');
+});
+
+app.get('/health', (_req, res) => {
+  res.json({
+    ok: true,
+    service: 'Aurelius Fire',
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.listen(3000, () => console.log('Aurelius Fire running on http://localhost:3000'));
 export default app;

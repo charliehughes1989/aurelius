@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contact | Aurelius Fire Risk</title>
+<meta name="description" content="Contact Aurelius Fire Risk to enquire about a fire risk assessment.">
+<style>
+body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f7f9fc;color:#172033}
+main{max-width:850px;margin:50px auto;padding:40px;background:white;border-radius:16px;box-shadow:0 8px 30px #0001}
+h1{color:#0b4f8a}
+label{display:block;margin-top:18px;font-weight:600}
+input,textarea{width:100%;box-sizing:border-box;padding:13px;margin-top:7px;border:1px solid #d7dce5;border-radius:8px}
+button{margin-top:20px;padding:13px 22px;background:#0b4f8a;color:white;border:0;border-radius:8px;cursor:pointer}
+a{color:#0b4f8a}
+</style>
+</head>
+<body>
+<main>
+<h1>Contact Aurelius Fire Risk</h1>
+<p>Use the form below to make an enquiry or request a fire risk assessment.</p>
+
+<form method="post" action="/api/enquiries">
+<label>Name
+<input name="name" required>
+</label>
+
+<label>Business
+<input name="business">
+</label>
+
+<label>Email
+<input type="email" name="email" required>
+</label>
+
+<label>Telephone
+<input name="phone">
+</label>
+
+<label>Message
+<textarea name="message" rows="7" required></textarea>
+</label>
+
+<button type="submit">Send enquiry</button>
+</form>
+
+<p><a href="/">Return to website</a></p>
+</main>
+</body>
+</html>

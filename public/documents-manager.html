@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurelius — Documents & Actions</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:#f5f7fa;color:#172033}
+header{background:#fff;border-bottom:1px solid #e5e7eb;padding:18px 28px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:800;font-size:20px;color:#123b69}
+.logo span{color:#c62828}
+main{max-width:1400px;margin:auto;padding:28px}
+h1{margin:0 0 6px}
+.sub{color:#6b7280;margin-bottom:25px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:25px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:20px}
+.stat{font-size:30px;font-weight:800}
+.label{font-size:13px;color:#6b7280;margin-top:4px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+button{border:0;border-radius:8px;padding:10px 15px;background:#123b69;color:white;font-weight:700;cursor:pointer}
+button.secondary{background:#e8eef5;color:#123b69}
+button.red{background:#b91c1c}
+input,select,textarea{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font:inherit}
+table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}
+th,td{text-align:left;padding:13px;border-bottom:1px solid #edf0f3;font-size:14px}
+th{background:#f8fafc}
+.badge{display:inline-block;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:700}
+.high{background:#fee2e2;color:#991b1b}
+.medium{background:#fef3c7;color:#92400e}
+.low{background:#dcfce7;color:#166534}
+.complete{background:#dcfce7;color:#166534}
+.open{background:#fee2e2;color:#991b1b}
+.inprogress{background:#dbeafe;color:#1d4ed8}
+.modal{display:none;position:fixed;inset:0;background:#0008;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modalbox{background:#fff;border-radius:15px;padding:25px;max-width:650px;width:100%;max-height:90vh;overflow:auto}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.full{grid-column:1/-1}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}.formgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">AURELIUS <span>FIRE</span></div>
+  <div>Documents & Actions</div>
+</header>
+
+<main>
+<h1>Documents & Actions</h1>
+<div class="sub">Manage final FRAs, client documents, certificates and corrective actions.</div>
+
+<div class="grid">
+  <div class="card"><div class="stat" id="documents">0</div><div class="label">Documents</div></div>
+  <div class="card"><div class="stat" id="released">0</div><div class="label">Released to Clients</div></div>
+  <div class="card"><div class="stat" id="actions">0</div><div class="label">Actions</div></div>
+  <div class="card"><div class="stat" id="high">0</div><div class="label">Open High Priority</div></div>
+</div>
+
+<div class="toolbar">
+  <button onclick="openDocument()">+ Add Document</button>
+  <button onclick="openAction()">+ Add Action</button>
+  <button class="secondary" onclick="loadAll()">Refresh</button>
+</div>
+
+<h2>Documents</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Status</th>
+<th>Client</th>
+<th>Uploaded</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="documentsTable"></tbody>
+</table>
+
+<br>
+
+<h2>Actions Register</h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Priority</th>
+<th>Timescale</th>
+<th>Status</th>
+<th>Due</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="actionsTable"></tbody>
+</table>
+</main>
+
+<div class="modal" id="modal">
+<div class="modalbox">
+<h2 id="modalTitle">Add</h2>
+
+<div id="documentForm">
+<div class="formgrid">
+<div><label>Name</label><input id="dName"></div>
+<div><label>Type</label>
+<select id="dType">
+<option>Final FRA</option>
+<option>EICR</option>
+<option>Gas Certificate</option>
+<option>Fire Alarm Service</option>
+<option>Emergency Lighting</option>
+<option>Fire Extinguisher Service</option>
+<option>Fire Strategy</option>
+<option>Other</option>
+</select></div>
+<div><label>Client ID</label><input id="dClient"></div>
+<div><label>Premises ID</label><input id="dPremises"></div>
+<div><label>Assessment ID</label><input id="dAssessment"></div>
+<div><label>File name</label><input id="dFile"></div>
+<div class="full"><label>Description</label><textarea id="dDescription"></textarea></div>
+<div><label>Status</label>
+<select id="dStatus">
+<option>Draft</option>
+<option>Released</option>
+</select></div>
+<div><label>Release to client</label>
+<select id="dRelease">
+<option value="0">No</option>
+<option value="1">Yes</option>
+</select></div>
+</div>
+</div>
+
+<div id="actionForm" style="display:none">
+<div class="formgrid">
+<div><label>Action</label><input id="aTitle"></div>
+<div><label>Priority</label>
+<select id="aPriority">
+<option>High</option>
+<option>Medium</option>
+<option>Low</option>
+</select></div>
+<div><label>Timescale</label>
+<select id="aTimescale">
+<option>0–1 months</option>
+<option>3 months</option>
+<option>6 months</option>
+<option>12 months</option>
+</select></div>
+<div><label>Status</label>
+<select id="aStatus">
+<option>Open</option>
+<option>In Progress</option>
+<option>Complete</option>
+</select></div>
+<div><label>Client ID</label><input id="aClient"></div>
+<div><label>Premises ID</label><input id="aPremises"></div>
+<div><label>Assessment ID</label><input id="aAssessment"></div>
+<div><label>Due date</label><input id="aDue" type="date"></div>
+<div class="full"><label>Recommendation / description</label><textarea id="aDescription"></textarea></div>
+</div>
+</div>
+
+<div class="actions">
+<button class="secondary" onclick="closeModal()">Cancel</button>
+<button onclick="save()">Save</button>
+</div>
+</div>
+</div>
+
+<script>
+let mode='document';
+
+const api=(url,options={}) =>
+ fetch('/api/documents-actions'+url,{
+   headers:{'Content-Type':'application/json'},
+   ...options
+ }).then(async r=>{
+   const data=await r.json().catch(()=>({}));
+   if(!r.ok) throw new Error(data.error||'Request failed');
+   return data;
+ });
+
+function openDocument(){
+ mode='document';
+ document.getElementById('documentForm').style.display='block';
+ document.getElementById('actionForm').style.display='none';
+ document.getElementById('modalTitle').textContent='Add Document';
+ document.getElementById('modal').classList.add('open');
+}
+
+function openAction(){
+ mode='action';
+ document.getElementById('documentForm').style.display='none';
+ document.getElementById('actionForm').style.display='block';
+ document.getElementById('modalTitle').textContent='Add Action';
+ document.getElementById('modal').classList.add('open');
+}
+
+function closeModal(){
+ document.getElementById('modal').classList.remove('open');
+}
+
+async function save(){
+ try{
+  if(mode==='document'){
+   await api('/documents',{
+    method:'POST',
+    body:JSON.stringify({
+     name:dName.value,
+     title:dName.value,
+     type:dType.value,
+     clientId:dClient.value,
+     premisesId:dPremises.value,
+     assessmentId:dAssessment.value,
+     fileName:dFile.value,
+     description:dDescription.value,
+     status:dStatus.value,
+     releasedToClient:dRelease.value==='1'
+    })
+   });
+  }else{
+   await api('/actions',{
+    method:'POST',
+    body:JSON.stringify({
+     title:aTitle.value,
+     priority:aPriority.value,
+     timescale:aTimescale.value,
+     status:aStatus.value,
+     clientId:aClient.value,
+     premisesId:aPremises.value,
+     assessmentId:aAssessment.value,
+     dueDate:aDue.value,
+     description:aDescription.value,
+     recommendation:aDescription.value
+    })
+   });
+  }
+
+  closeModal();
+  await loadAll();
+ }catch(e){
+  alert(e.message);
+ }
+}
+
+async function loadAll(){
+ try{
+  const s=await api('/summary');
+
+  documents.textContent=s.documents||0;
+  released.textContent=s.releasedDocuments||0;
+  actions.textContent=s.actions||0;
+  high.textContent=s.highPriorityActions||0;
+
+  const d=await api('/documents');
+  documentsTable.innerHTML=d.map(x=>`
+   <tr>
+    <td><strong>${esc(x.name||x.title)}</strong><br><small>${esc(x.fileName||'')}</small></td>
+    <td>${esc(x.type||'Other')}</td>
+    <td><span class="badge ${x.status==='Released'?'complete':'open'}">${esc(x.status||'Draft')}</span></td>
+    <td>${esc(x.clientId||'—')}</td>
+    <td>${esc((x.uploadedAt||'').slice(0,10))}</td>
+    <td>
+      <button class="secondary" onclick="toggleRelease('${x.id}',${!!x.releasedToClient})">
+       ${x.releasedToClient?'Withdraw':'Release'}
+      </button>
+      <button class="red" onclick="deleteDocument('${x.id}')">Delete</button>
+    </td>
+   </tr>
+  `).join('') || '<tr><td colspan="6">No documents yet.</td></tr>';
+
+  const a=await api('/actions');
+
+  actionsTable.innerHTML=a.filter(x=>!x.archived).map(x=>`
+   <tr>
+    <td><strong>${esc(x.title)}</strong><br><small>${esc(x.description||'')}</small></td>
+    <td><span class="badge ${String(x.priority||'').toLowerCase()}">${esc(x.priority||'Medium')}</span></td>
+    <td>${esc(x.timescale||'')}</td>
+    <td><span class="badge ${x.status==='Complete'?'complete':x.status==='In Progress'?'inprogress':'open'}">${esc(x.status||'Open')}</span></td>
+    <td>${esc(x.dueDate||'—')}</td>
+    <td>
+      <button onclick="completeAction('${x.id}')">
+       ${x.status==='Complete'?'Re-open':'Complete'}
+      </button>
+     </td>
+   </tr>
+  `).join('') || '<tr><td colspan="6">No actions yet.</td></tr>';
+
+ }catch(e){
+  console.error(e);
+ }
+}
+
+async function toggleRelease(id,current){
+ await api('/documents/'+id,{
+  method:'PUT',
+  body:JSON.stringify({
+   releasedToClient:!current,
+   status:!current?'Released':'Draft'
+  })
+ });
+ loadAll();
+}
+
+async function deleteDocument(id){
+ if(!confirm('Delete this document?')) return;
+ await api('/documents/'+id,{method:'DELETE'});
+ loadAll();
+}
+
+async function completeAction(id){
+ const a=await api('/actions/'+id);
+
+ await api('/actions/'+id,{
+  method:'PUT',
+  body:JSON.stringify({
+   status:a.status==='Complete'?'Open':'Complete'
+  })
+ });
+
+ loadAll();
+}
+
+function esc(v){
+ return String(v??'')
+  .replaceAll('&','&amp;')
+  .replaceAll('<','&lt;')
+  .replaceAll('>','&gt;')
+  .replaceAll('"','&quot;')
+  .replaceAll("'","&#039;");
+}
+
+loadAll();
+</script>
+</body>
+</html>

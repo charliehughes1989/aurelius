@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurelius Fire | Client Portal</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  background:#f6f8fb;
+  color:#172033;
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+
+.top{
+  height:72px;
+  background:#fff;
+  border-bottom:1px solid #e4e7ec;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 30px;
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:21px;
+  font-weight:800;
+}
+.logo-mark{
+  width:34px;
+  height:34px;
+  border-radius:9px;
+  background:#d71920;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+}
+.logo span:last-child{color:#1769aa}
+
+.user{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.avatar{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  background:#1769aa;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+}
+
+.layout{
+  display:flex;
+  min-height:calc(100vh - 72px);
+}
+
+.sidebar{
+  width:240px;
+  background:#fff;
+  border-right:1px solid #e4e7ec;
+  padding:24px 14px;
+}
+
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.nav button{
+  border:0;
+  background:transparent;
+  text-align:left;
+  padding:12px 14px;
+  border-radius:9px;
+  color:#475467;
+  font-weight:600;
+}
+.nav button:hover,
+.nav button.active{
+  background:#eef6fc;
+  color:#1769aa;
+}
+
+.main{
+  flex:1;
+  padding:30px;
+  max-width:1400px;
+}
+
+.page-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  margin-bottom:25px;
+}
+.page-title h1{
+  margin:0 0 6px;
+  font-size:28px;
+}
+.page-title p{
+  margin:0;
+  color:#667085;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid #e4e7ec;
+  border-radius:14px;
+  padding:20px;
+  box-shadow:0 2px 5px rgba(16,24,40,.03);
+}
+
+.stat{
+  font-size:30px;
+  font-weight:800;
+  margin-top:8px;
+}
+.muted{color:#667085;font-size:13px}
+
+.section{
+  margin-top:22px;
+}
+
+.section h2{
+  font-size:18px;
+  margin:0 0 14px;
+}
+
+.table-wrap{
+  overflow:auto;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+th,td{
+  text-align:left;
+  padding:14px;
+  border-bottom:1px solid #eaecf0;
+  white-space:nowrap;
+}
+th{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:#667085;
+}
+td{font-size:14px}
+
+.badge{
+  display:inline-flex;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  background:#eef6fc;
+  color:#1769aa;
+}
+
+.badge.green{
+  background:#ecfdf3;
+  color:#027a48;
+}
+.badge.orange{
+  background:#fffaeb;
+  color:#b54708;
+}
+.badge.red{
+  background:#fef3f2;
+  color:#b42318;
+}
+
+.primary{
+  border:0;
+  background:#1769aa;
+  color:#fff;
+  padding:11px 16px;
+  border-radius:8px;
+  font-weight:700;
+}
+.primary:hover{background:#145b91}
+
+.secondary{
+  border:1px solid #d0d5dd;
+  background:#fff;
+  color:#344054;
+  padding:10px 15px;
+  border-radius:8px;
+  font-weight:600;
+}
+
+.hero{
+  background:linear-gradient(135deg,#1769aa,#0b4f81);
+  color:#fff;
+  border-radius:16px;
+  padding:28px;
+}
+.hero h2{
+  margin:0 0 7px;
+  font-size:23px;
+}
+.hero p{
+  margin:0;
+  opacity:.9;
+}
+
+.action{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  padding:17px 0;
+  border-bottom:1px solid #eaecf0;
+}
+.action:last-child{border-bottom:0}
+
+.empty{
+  padding:40px;
+  text-align:center;
+  color:#667085;
+}
+
+.profile-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+.field{
+  margin-bottom:16px;
+}
+.field label{
+  display:block;
+  margin-bottom:6px;
+  font-size:13px;
+  font-weight:700;
+  color:#344054;
+}
+.field input,
+.field textarea,
+.field select{
+  width:100%;
+  border:1px solid #d0d5dd;
+  border-radius:8px;
+  padding:11px 12px;
+  background:#fff;
+}
+.field textarea{min-height:100px;resize:vertical}
+
+.notice{
+  padding:14px 16px;
+  background:#eef6fc;
+  border:1px solid #c9e3f7;
+  border-radius:10px;
+  color:#145b91;
+  margin-bottom:18px;
+}
+
+.mobile-menu{display:none}
+
+@media(max-width:900px){
+  .sidebar{display:none}
+  .mobile-menu{display:block}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .profile-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .top{padding:0 15px}
+  .main{padding:18px}
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header class="top">
+  <div class="logo">
+    <div class="logo-mark">F</div>
+    <span>Aurelius</span>
+    <span>Fire</span>
+  </div>
+
+  <div class="user">
+    <span id="clientName">Client</span>
+    <div class="avatar" id="clientAvatar">C</div>
+  </div>
+</header>
+
+<div class="layout">
+
+<aside class="sidebar">
+  <nav class="nav">
+    <button class="active" data-page="dashboard">Dashboard</button>
+    <button data-page="premises">My Premises</button>
+    
+<button data-page="quote">Quote</button>
+<button data-page="terms">Engagement Terms</button>
+<button data-page="booking">Booking</button>
+
+    <button data-page="booking">Booking</button>
+    <button data-page="documents">Documents</button>
+    <button data-page="actions">Actions</button>
+    <button data-page="payments">Payments & Invoices</button>
+    <button data-page="messages">Messages</button>
+    <button data-page="profile">My Details</button>
+  </nav>
+</aside>
+
+<main class="main" id="app"></main>
+
+</div>
+
+<script>
+const state = {
+  page: 'dashboard',
+  client: null,
+  premises: [],
+  quotes: [],
+  bookings: [],
+  documents: [],
+  actions: [],
+  payments: [],
+  invoices: [],
+  messages: []
+};
+
+const typeMap = {
+  premises: 'premises',
+  quotes: 'quote',
+  bookings: 'booking',
+  documents: 'document',
+  actions: 'action',
+  payments: 'payment',
+  invoices: 'invoice',
+  messages: 'message'
+};
+
+async function api(path, options={}) {
+  const r = await fetch('/api/portal' + path, {
+    credentials:'include',
+    headers:{'Content-Type':'application/json',...(options.headers||{})},
+    ...options
+  });
+
+  let data={};
+  try{data=await r.json()}catch{}
+
+  if(!r.ok) throw new Error(data.error || 'Unable to load portal');
+  return data;
+}
+
+async function loadData(){
+  /*
+   * The portal uses the existing authenticated portal session.
+   * If the backend returns a specific client payload we use it.
+   * The UI also remains usable while individual sections are empty.
+   */
+
+  try{
+    const result = await api('/me');
+    state.client = result.client || result.user || result.data || null;
+  }catch(e){
+    console.log('Portal profile endpoint unavailable:',e.message);
+  }
+
+  for(const [key,type] of Object.entries(typeMap)){
+    try{
+      const result = await api('/' + key);
+      state[key] = result.data || result[type] || [];
+    }catch(e){
+      state[key] = [];
+    }
+  }
+
+  updateHeader();
+  render();
+}
+
+function updateHeader(){
+  const name =
+    state.client?.name ||
+    state.client?.full_name ||
+    state.client?.company ||
+    'Client';
+
+  document.getElementById('clientName').textContent = name;
+
+  document.getElementById('clientAvatar').textContent =
+    name.charAt(0).toUpperCase();
+}
+
+function money(value){
+  const n=Number(value||0);
+  return '£' + n.toFixed(2);
+}
+
+function esc(value){
+  return String(value ?? '')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;');
+}
+
+function badge(status){
+  const s=String(status||'Pending');
+  let cls='';
+
+  if(/paid|complete|accepted|approved/i.test(s)) cls='green';
+  else if(/urgent|overdue|declined|rejected/i.test(s)) cls='red';
+  else if(/pending|await|open/i.test(s)) cls='orange';
+
+  return '<span class="badge '+cls+'">'+esc(s)+'</span>';
+}
+
+function render(){
+  document.querySelectorAll('.nav button').forEach(btn=>{
+    btn.classList.toggle('active',btn.dataset.page===state.page);
+  });
+
+  const pages={
+    dashboard:dashboardPage,
+    premises:premisesPage,
+    quote:quotePage,
+    terms:termsPage,
+    booking:bookingPage,
+    documents:documentsPage,
+    actions:actionsPage,
+    payments:paymentsPage,
+    messages:messagesPage,
+    profile:profilePage
+  };
+
+  document.getElementById('app').innerHTML =
+    (pages[state.page] || dashboardPage)();
+
+  if(state.page==='terms') {
+    loadTerms();
+  }
+
+  if(state.page==='booking') {
+    loadAvailability();
+  }
+}
+
+function dashboardPage(){
+  const openActions=state.actions.filter(x=>
+    !/complete|closed/i.test(x.status||'')
+  ).length;
+
+  const pendingDocs=state.documents.filter(x=>
+    /pending|requested/i.test(x.status||'')
+  ).length;
+
+  const nextBooking=state.bookings[0];
+
+  return `
+    <div class="page-title">
+      <div>
+        <h1>Client Dashboard</h1>
+        <p>Manage your Aurelius Fire assessment from one place.</p>
+      </div>
+      <button class="secondary" onclick="loadData()">↻ Refresh</button>
+    </div>
+
+    <div class="hero">
+      <h2>Welcome to Aurelius Fire</h2>
+      <p>Your assessment, documents, actions and booking information are all held here.</p>
+    </div>
+
+    <div class="grid section">
+      <div class="card">
+        <div class="muted">Premises</div>
+        <div class="stat">${state.premises.length}</div>
+      </div>
+
+      <div class="card">
+        <div class="muted">Open Actions</div>
+        <div class="stat">${openActions}</div>
+      </div>
+
+      <div class="card">
+        <div class="muted">Documents</div>
+        <div class="stat">${state.documents.length}</div>
+      </div>
+
+      <div class="card">
+        <div class="muted">Pending Documents</div>
+        <div class="stat">${pendingDocs}</div>
+      </div>
+    </div>
+
+    <div class="section card">
+      <h2>Next Booking</h2>
+      ${
+        nextBooking
+        ? `
+          <div class="action">
+            <div>
+              <strong>${esc(nextBooking.date || nextBooking.booking_date || 'Booking')}</strong>
+              <div class="muted">${esc(nextBooking.time || nextBooking.booking_time || '')}</div>
+            </div>
+            ${badge(nextBooking.status || 'Confirmed')}
+          </div>
+        `
+        : `<div class="empty">No booking currently scheduled.</div>`
+      }
+    </div>
+
+    <div class="section card">
+      <h2>Quick Actions</h2>
+
+      <div class="action">
+        <div>
+          <strong>View your premises</strong>
+          <div class="muted">Check the information we hold for your property.</div>
+        </div>
+        <button class="secondary" onclick="go('premises')">Open</button>
+      </div>
+
+      <div class="action">
+        <div>
+          <strong>View documents</strong>
+          <div class="muted">Access your FRA and supporting documents.</div>
+        </div>
+        <button class="secondary" onclick="go('documents')">Open</button>
+      </div>
+
+      <div class="action">
+        <div>
+          <strong>Review actions</strong>
+          <div class="muted">See recommendations and their current status.</div>
+        </div>
+        <button class="secondary" onclick="go('actions')">Open</button>
+      </div>
+    </div>
+  `;
+}
+
+function premisesPage(){
+  return `
+    <div class="page-title">
+      <div>
+        <h1>My Premises</h1>
+        <p>Premises information held for your assessment.</p>
+      </div>
+    </div>
+
+    ${
+      state.premises.length
+      ? state.premises.map(p=>`
+        <div class="card section">
+          <div class="action">
+            <div>
+              <strong>${esc(p.name || p.premises_name || 'Premises')}</strong>
+              <div class="muted">${esc(p.address || '')}</div>
+            </div>
+            ${badge(p.status || 'Active')}
+          </div>
+
+          <div class="profile-grid" style="margin-top:18px">
+            <div><div class="muted">Floors</div><strong>${esc(p.floors || '—')}</strong></div>
+            <div><div class="muted">Approx. Size</div><strong>${esc(p.size || p.floor_area || '—')}</strong></div>
+            <div><div class="muted">Occupancy</div><strong>${esc(p.occupancy || '—')}</strong></div>
+            <div><div class="muted">Use</div><strong>${esc(p.use || p.premises_use || '—')}</strong></div>
+          </div>
+        </div>
+      `).join('')
+      : `<div class="card empty">No premises have been added yet.</div>`
+    }
+  `;
+}
+
+function quotePage(){
+  const q=state.quotes[0];
+
+  return `
+    <div class="page-title">
+      <div>
+        <h1>Your Quote</h1>
+        <p>Review your Aurelius Fire quotation.</p>
+      </div>
+    </div>
+
+    ${
+      q
+      ? `
+      <div class="card">
+        <div class="profile-grid">
+          <div>
+            <div class="muted">Quote Reference</div>
+            <strong>${esc(q.reference || q.quote_number || q.id)}</strong>
+          </div>
+          <div>
+            <div class="muted">Status</div>
+            ${badge(q.status)}
+          </div>
+          <div>
+            <div class="muted">Assessment</div>
+            <strong>${esc(q.service || q.assessment_type || 'Fire Risk Assessment')}</strong>
+          </div>
+          <div>
+            <div class="muted">Total</div>
+            <strong style="font-size:24px">${money(q.total || q.amount || q.price)}</strong>
+          </div>
+        </div>
+
+        <div style="margin-top:25px">
+          ${
+            /pending|sent/i.test(q.status||'')
+            ? `
+            <button class="primary" onclick="acceptQuote('${esc(q.id)}')">
+              Accept Quote
+            </button>
+            `
+            : ''
+          }
+        </div>
+      </div>
+      `
+      : `<div class="card empty">No quote is currently available.</div>`
+    }
+  `;
+}
+
+
+function termsPage(){
+  return `
+    <div class="page-title">
+      <div>
+        <h1>Engagement Terms</h1>
+        <p>Review and electronically sign your Aurelius Fire engagement terms.</p>
+      </div>
+    </div>
+
+    <div id="termsContainer" class="card">
+      <div class="empty">Loading engagement terms...</div>
+    </div>
+  `;
+}
+
+async function loadTerms(){
+  try{
+    const result=await fetch('/api/client-journey/terms',{
+      credentials:'include'
+    });
+
+    const data=await result.json();
+
+    const container=document.getElementById('termsContainer');
+
+    if(!container) return;
+
+    const terms=String(data.terms || '');
+
+    container.innerHTML=`
+      <div style="
+        white-space:pre-wrap;
+        line-height:1.7;
+        max-height:500px;
+        overflow:auto;
+        padding:20px;
+        border:1px solid #eaecf0;
+        border-radius:10px;
+        background:#fafafa;
+      ">${esc(terms)}</div>
+
+      <div style="margin-top:22px">
+
+        <div class="field">
+          <label>Your full name</label>
+          <input id="termsName" placeholder="Enter your full name">
+        </div>
+
+        <div class="field">
+          <label>Electronic signature</label>
+          <input id="termsSignature" placeholder="Type your full name as your electronic signature">
+        </div>
+
+        <label style="display:flex;gap:10px;align-items:flex-start;margin:18px 0;font-weight:600">
+          <input type="checkbox" id="termsAccepted">
+          <span>I confirm that I have read and agree to the Aurelius Fire engagement terms.</span>
+        </label>
+
+        <button class="primary" onclick="signTerms()">
+          Accept & Sign Terms
+        </button>
+      </div>
+    `;
+  }catch(e){
+    const container=document.getElementById('termsContainer');
+    if(container){
+      container.innerHTML=
+        '<div class="empty">Unable to load the engagement terms.</div>';
+    }
+  }
+}
+
+async function signTerms(){
+  const q=state.quotes[0];
+
+  if(!q){
+    alert('There is no quote available to sign against.');
+    return;
+  }
+
+  const name=document.getElementById('termsName')?.value.trim();
+  const signature=document.getElementById('termsSignature')?.value.trim();
+  const accepted=document.getElementById('termsAccepted')?.checked;
+
+  if(!name || !signature || !accepted){
+    alert('Please enter your name, signature and accept the terms.');
+    return;
+  }
+
+  try{
+    await fetch('/api/client-journey/terms/sign',{
+      method:'POST',
+      credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        quote_id:q.id,
+        client_name:name,
+        signature,
+        accepted:true
+      })
+    });
+
+    alert('Terms accepted and signed. You can now request your assessment booking.');
+
+    await loadData();
+    go('booking');
+  }catch(e){
+    alert('Unable to sign the terms.');
+  }
+}
+
+
+function bookingPage(){
+  return `
+    <div class="page-title">
+      <div>
+        <h1>Book Your Assessment</h1>
+        <p>Select an available Friday evening or weekend appointment.</p>
+      </div>
+    </div>
+
+    <div class="notice">
+      Appointments can be requested up to 90 days ahead. Your appointment is confirmed once Aurelius Fire approves the requested slot.
+    </div>
+
+    <div class="card">
+      <div class="profile-grid">
+        <div class="field">
+          <label>Date</label>
+          <select id="bookingDate">
+            <option value="">Select a date</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Time</label>
+          <select id="bookingTime">
+            <option value="">Select a time</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Additional information</label>
+        <textarea id="bookingNotes" placeholder="Anything we should know before the visit?"></textarea>
+      </div>
+
+      <button class="primary" onclick="requestBooking()">
+        Request Booking
+      </button>
+    </div>
+
+    <div class="section card">
+      <h2>Existing Bookings</h2>
+
+      ${
+        state.bookings.length
+        ? state.bookings.map(b=>`
+          <div class="action">
+            <div>
+              <strong>${esc(b.date || b.booking_date || '')}</strong>
+              <div class="muted">${esc(b.time || b.booking_time || '')}</div>
+            </div>
+            ${badge(b.status || 'Requested')}
+          </div>
+        `).join('')
+        : `<div class="empty">No bookings yet.</div>`
+      }
+    </div>
+  `;
+}
+
+async function loadAvailability(){
+  const dateSelect=document.getElementById('bookingDate');
+
+  if(!dateSelect) return;
+
+  try{
+    const r=await fetch('/api/client-journey/availability',{
+      credentials:'include'
+    });
+
+    const result=await r.json();
+
+    const dates=[...new Set(
+      (result.data || []).map(x=>x.date)
+    )];
+
+    dateSelect.innerHTML=
+      '<option value="">Select a date</option>' +
+      dates.map(d=>`
+        <option value="${esc(d)}">${esc(d)}</option>
+      `).join('');
+
+    dateSelect.addEventListener('change',()=>{
+      const timeSelect=document.getElementById('bookingTime');
+
+      const options=(result.data || [])
+        .filter(x=>x.date===dateSelect.value);
+
+      timeSelect.innerHTML=
+        '<option value="">Select a time</option>' +
+        options.map(x=>`
+          <option value="${esc(x.time)}">${esc(x.time)}</option>
+        `).join('');
+    });
+  }catch(e){
+    console.error(e);
+  }
+}
+
+async function requestBooking(){
+  const q=state.quotes[0];
+
+  if(!q){
+    alert('A quote is required before booking.');
+    return;
+  }
+
+  if(!q.terms_signed){
+    alert('Please accept and sign the engagement terms before requesting a booking.');
+    go('terms');
+    return;
+  }
+
+  const date=document.getElementById('bookingDate')?.value;
+  const time=document.getElementById('bookingTime')?.value;
+  const notes=document.getElementById('bookingNotes')?.value || '';
+
+  if(!date || !time){
+    alert('Please select a date and time.');
+    return;
+  }
+
+  try{
+    const r=await fetch('/api/client-journey/booking/request',{
+      method:'POST',
+      credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        quote_id:q.id,
+        date,
+        time,
+        notes
+      })
+    });
+
+    const result=await r.json();
+
+    if(!r.ok){
+      throw new Error(result.error || 'Unable to request booking');
+    }
+
+    alert('Booking request sent to Aurelius Fire.');
+
+    await loadData();
+  }catch(e){
+    alert(e.message || 'Unable to request booking.');
+  }
+}
+
+
+function documentsPage(){
+  return `
+    <div class="page-title">
+      <div>
+        <h1>Documents</h1>
+        <p>Your Aurelius Fire documents and assessment reports.</p>
+      </div>
+    </div>
+
+    <div class="notice">
+      Your final Fire Risk Assessment will appear here once it has been completed and released to you.
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Document</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+          ${
+            state.documents.length
+            ? state.documents.map(d=>`
+              <tr>
+                <td><strong>${esc(d.name || d.filename || 'Document')}</strong></td>
+                <td>${esc(d.type || d.document_type || 'Document')}</td>
+                <td>${badge(d.status || 'Available')}</td>
+                <td>
+                  ${
+                    d.url
+                    ? `<a class="secondary" href="${esc(d.url)}" target="_blank">Open</a>`
+                    : ''
+                  }
+                </td>
+              </tr>
+            `).join('')
+            : `
+            <tr>
+              <td colspan="4" class="empty">No documents available.</td>
+            </tr>
+            `
+          }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function actionsPage(){
+  return `
+    <div class="page-title">
+      <div>
+        <h1>Actions</h1>
+        <p>Recommendations arising from your fire risk assessment.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Priority</th>
+              <th>Timescale</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+          ${
+            state.actions.length
+            ? state.actions.map(a=>`
+              <tr>
+                <td style="white-space:normal;min-width:350px">
+                  <strong>${esc(a.title || a.description || 'Action')}</strong>
+                </td>
+                <td>${badge(a.priority || 'Medium')}</td>
+                <td>${esc(a.timescale || '—')}</td>
+                <td>${badge(a.status || 'Open')}</td>
+              </tr>
+            `).join('')
+            : `
+            <tr>
+              <td colspan="4" class="empty">No actions currently recorded.</td>
+            </tr>
+            `
+          }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function paymentsPage(){
+  return `
+    <div class="page-title">
+      <div>
+        <h1>Payments & Invoices</h1>
+        <p>View your payment history and invoices.</p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="muted">Invoices</div>
+        <div class="stat">${state.invoices.length}</div>
+      </div>
+      <div class="card">
+        <div class="muted">Payments</div>
+        <div class="stat">${state.payments.length}</div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Invoices</h2>
+
+      ${
+        state.invoices.length
+        ? state.invoices.map(i=>`
+          <div class="action">
+            <div>
+              <strong>${esc(i.reference || i.invoice_number || 'Invoice')}</strong>
+              <div class="muted">${esc(i.date || '')}</div>
+            </div>
+            <div style="text-align:right">
+              <strong>${money(i.total || i.amount)}</strong>
+              <div>${badge(i.status || 'Outstanding')}</div>
+            </div>
+          </div>
+        `).join('')
+        : `<div class="empty">No invoices currently available.</div>`
+      }
+    </div>
+  `;
+}
+
+function messagesPage(){
+  return `
+    <div class="page-title">
+      <div>
+        <h1>Messages</h1>
+        <p>Communication with Aurelius Fire.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      ${
+        state.messages.length
+        ? state.messages.map(m=>`
+          <div class="action">
+            <div>
+              <strong>${esc(m.subject || 'Message')}</strong>
+              <div class="muted">${esc(m.date || m.created_at || '')}</div>
+              <p>${esc(m.message || m.body || '')}</p>
+            </div>
+          </div>
+        `).join('')
+        : `<div class="empty">No messages yet.</div>`
+      }
+
+      <div style="margin-top:20px">
+        <button class="primary" onclick="newMessage()">Send Message</button>
+      </div>
+    </div>
+  `;
+}
+
+function profilePage(){
+  const c=state.client || {};
+
+  return `
+    <div class="page-title">
+      <div>
+        <h1>My Details</h1>
+        <p>Check the information held against your account.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="profile-grid">
+
+        <div class="field">
+          <label>Name</label>
+          <input id="profileName" value="${esc(c.name || c.full_name || '')}">
+        </div>
+
+        <div class="field">
+          <label>Company</label>
+          <input id="profileCompany" value="${esc(c.company || '')}">
+        </div>
+
+        <div class="field">
+          <label>Email</label>
+          <input id="profileEmail" value="${esc(c.email || '')}">
+        </div>
+
+        <div class="field">
+          <label>Telephone</label>
+          <input id="profilePhone" value="${esc(c.phone || c.telephone || '')}">
+        </div>
+
+      </div>
+
+      <button class="primary" onclick="saveProfile()">Save Details</button>
+    </div>
+  `;
+}
+
+function go(page){
+  state.page=page;
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function acceptQuote(id){
+  try{
+    await api('/quote/' + encodeURIComponent(id) + '/accept',{
+      method:'POST'
+    });
+
+    alert('Quote accepted. Aurelius Fire will now progress your booking.');
+    await loadData();
+  }catch(e){
+    alert(e.message || 'Unable to accept quote.');
+  }
+}
+
+async function saveProfile(){
+  try{
+    const data={
+      name:document.getElementById('profileName').value,
+      company:document.getElementById('profileCompany').value,
+      email:document.getElementById('profileEmail').value,
+      phone:document.getElementById('profilePhone').value
+    };
+
+    await api('/profile',{
+      method:'PUT',
+      body:JSON.stringify(data)
+    });
+
+    alert('Your details have been updated.');
+    await loadData();
+  }catch(e){
+    alert(e.message || 'Unable to update details.');
+  }
+}
+
+function newMessage(){
+  const message=prompt('Enter your message for Aurelius Fire:');
+
+  if(!message) return;
+
+  api('/messages',{
+    method:'POST',
+    body:JSON.stringify({message})
+  })
+  .then(()=>{
+    alert('Message sent.');
+    loadData();
+  })
+  .catch(e=>alert(e.message || 'Unable to send message.'));
+}
+
+document.querySelectorAll('.nav button').forEach(button=>{
+  button.addEventListener('click',()=>{
+    go(button.dataset.page);
+  });
+});
+
+loadData();
+</script>
+
+
+<section id="clientDocuments" style="margin-top:30px">
+  <div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:22px">
+    <h2>Documents</h2>
+    <p style="color:#6b7280">Released documents and final fire risk assessment reports.</p>
+    <div id="releasedDocuments">Loading…</div>
+  </div>
+</section>
+
+<section id="clientActions" style="margin-top:20px">
+  <div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:22px">
+    <h2>Actions</h2>
+    <p style="color:#6b7280">Current recommendations and action status.</p>
+    <div id="clientActionRegister">Loading…</div>
+  </div>
+</section>
+
+<script>
+async function loadAureliusClientResources(clientId){
+  if(!clientId) return;
+
+  try{
+    const [docs, actions] = await Promise.all([
+      fetch('/api/documents-actions/client/'+encodeURIComponent(clientId)+'/documents').then(r=>r.json()),
+      fetch('/api/documents-actions/client/'+encodeURIComponent(clientId)+'/actions').then(r=>r.json())
+    ]);
+
+    const docTarget=document.getElementById('releasedDocuments');
+    const actionTarget=document.getElementById('clientActionRegister');
+
+    if(docTarget){
+      docTarget.innerHTML = docs.length
+        ? docs.map(d=>`
+          <div style="padding:14px 0;border-bottom:1px solid #eee">
+            <strong>${String(d.name||d.title||'Document').replaceAll('<','&lt;')}</strong>
+            <div style="font-size:13px;color:#6b7280">${String(d.type||'Other')}</div>
+            ${d.filePath ? `<a href="${d.filePath}" target="_blank">Open document</a>` : ''}
+          </div>
+        `).join('')
+        : '<p>No documents have been released yet.</p>';
+    }
+
+    if(actionTarget){
+      actionTarget.innerHTML = actions.length
+        ? actions.map(a=>`
+          <div style="padding:14px 0;border-bottom:1px solid #eee">
+            <strong>${String(a.title||'Action').replaceAll('<','&lt;')}</strong>
+            <div style="font-size:13px;margin-top:5px">
+              Priority: <strong>${String(a.priority||'Medium')}</strong>
+              &nbsp; | &nbsp;
+              Timescale: ${String(a.timescale||'')}
+              &nbsp; | &nbsp;
+              Status: ${String(a.status||'Open')}
+            </div>
+            <div style="font-size:13px;color:#6b7280;margin-top:5px">
+              ${String(a.description||'')}
+            </div>
+          </div>
+        `).join('')
+        : '<p>No actions currently recorded.</p>';
+    }
+  }catch(e){
+    console.error('Client resources failed',e);
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /booking-manager
+Disallow: /documents-manager
+Disallow: /onboarding-manager
+Disallow: /workflow-manager
+Disallow: /api/
+
+Sitemap: /sitemap.xml

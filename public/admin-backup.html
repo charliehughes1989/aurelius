@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurelius Fire | Admin CRM</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;color:#172033;background:#f4f6f8}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:245px;background:#111827;color:#fff;padding:25px 16px}
+.brand{font-size:21px;font-weight:800;padding:0 12px 30px}.brand span{color:#ef3340}
+.side a{display:block;padding:12px;border-radius:7px;color:#b9c1cd;text-decoration:none;margin:3px 0;cursor:pointer}
+.side a:hover,.side a.active{background:#273244;color:#fff}
+.main{margin-left:245px;padding:30px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}
+h1{margin:0;font-size:30px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.stat{background:#fff;border-radius:12px;padding:22px;border:1px solid #e5e8ec}.stat small{color:#6b7585}.stat strong{font-size:32px;display:block;margin-top:8px}
+.panel{background:#fff;border:1px solid #e5e8ec;border-radius:12px;padding:24px;margin-top:22px}
+.panel h2{margin-top:0}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:13px;border-bottom:1px solid #edf0f3;font-size:14px}
+.btn{border:0;border-radius:7px;padding:10px 15px;font-weight:700;cursor:pointer}.red{background:#d71920;color:#fff}.dark{background:#172033;color:#fff}.light{background:#eef1f5;color:#172033}
+.page{display:none}.page.active{display:block}
+.editor{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+input,textarea,select{width:100%;padding:11px;border:1px solid #d8dde5;border-radius:7px;margin:6px 0 15px;font:inherit}
+label{font-size:13px;font-weight:700}
+@media(max-width:800px){.sidebar{position:relative;width:auto}.main{margin-left:0}.grid,.editor{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+<div class="brand">AURELIUS <span>FIRE</span></div>
+<div class="side">
+<a class="active" onclick="show('dashboard',this)">Dashboard</a>
+<a onclick="show('enquiries',this)">Enquiries</a>
+<a onclick="show('clients',this)">Clients</a>
+<a onclick="show('premises',this)">Premises</a>
+<a onclick="show('quotes',this)">Quotes</a>
+<a onclick="show('bookings',this)">Bookings</a>
+<a onclick="show('documents',this)">Documents</a>
+<a onclick="show('actions',this)">Actions</a>
+<a onclick="show('messages',this)">Messages</a>
+<a onclick="show('payments',this)">Payments</a>
+<a onclick="show('content',this)">Website Editor</a>
+<a onclick="show('settings',this)">Settings</a>
+</div>
+</aside>
+
+<main class="main">
+<div class="top"><h1 id="title">Dashboard</h1><button class="btn red" onclick="location.href='/'">View Website</button></div>
+
+<div id="dashboard" class="page active">
+<div class="grid">
+<div class="stat"><small>Enquiries</small><strong id="sEnquiries">0</strong></div>
+<div class="stat"><small>Clients</small><strong id="sClients">0</strong></div>
+<div class="stat"><small>Quotes</small><strong id="sQuotes">0</strong></div>
+<div class="stat"><small>Bookings</small><strong id="sBookings">0</strong></div>
+</div>
+<div class="panel"><h2>CRM overview</h2><p>Manage your complete Aurelius Fire client journey from enquiry through assessment, payment, report and actions.</p></div>
+</div>
+
+<div id="enquiries" class="page"><div class="panel"><h2>Enquiries</h2><table><thead><tr><th>Client</th><th>Business</th><th>Premises</th><th>Status</th><th>Action</th></tr></thead><tbody id="enquiryRows"><tr><td colspan="5">Loading...</td></tr></tbody></table></div></div>
+
+<div id="clients" class="page"><div class="panel"><h2>Clients</h2><table><thead><tr><th>Name</th><th>Email</th><th>Business</th><th>Status</th></tr></thead><tbody id="clientRows"><tr><td colspan="4">Loading...</td></tr></tbody></table></div></div>
+
+<div id="premises" class="page"><div class="panel"><h2>Premises</h2><p>Premises linked to client accounts will appear here.</p></div></div>
+<div id="quotes" class="page"><div class="panel"><h2>Quotes</h2><p>Quotes and acceptance status.</p></div></div>
+<div id="bookings" class="page"><div class="panel"><h2>Bookings</h2><p>Assessment appointments and availability.</p></div></div>
+<div id="documents" class="page"><div class="panel"><h2>Documents</h2><p>Upload and manage completed FRAs, certificates, policies and supporting documents.</p></div></div>
+<div id="actions" class="page"><div class="panel"><h2>Actions</h2><p>Track fire-safety actions, responsible persons, priorities and completion.</p></div></div>
+<div id="messages" class="page"><div class="panel"><h2>Messages</h2><p>Client communications.</p></div></div>
+<div id="payments" class="page"><div class="panel"><h2>Payments</h2><p>Quotes, invoices and payment status.</p></div></div>
+
+<div id="content" class="page">
+<div class="panel">
+<h2>Website Editor</h2>
+<p>Edit your public website content without changing code.</p>
+<div class="editor">
+<div><label>Business name</label><input id="businessName" value="Aurelius Fire"></div>
+<div><label>Homepage headline</label><input id="headline" value="Fire safety made clear."></div>
+<div><label>Homepage introduction</label><textarea id="intro">Professional fire risk assessments for commercial premises.</textarea></div>
+<div><label>About text</label><textarea id="aboutText">Independent fire risk assessment services focused on practical compliance and life safety.</textarea></div>
+</div>
+<button class="btn red" onclick="saveContent()">Save Website Changes</button>
+</div>
+
+<div class="panel">
+<h2>Pricing Editor</h2>
+<div class="editor">
+<div><label>Small</label><input id="p1" value="345"></div>
+<div><label>Standard</label><input id="p2" value="495"></div>
+<div><label>Larger</label><input id="p3" value="695"></div>
+<div><label>Complex</label><input id="p4" value="995"></div>
+</div>
+<button class="btn red" onclick="savePricing()">Save Pricing</button>
+</div>
+
+<div class="panel">
+<h2>About Me</h2>
+<label>Photo</label><input type="file" accept="image/*">
+<label>About me</label><textarea rows="6">Independent fire risk assessor providing practical commercial fire safety assessments.</textarea>
+<button class="btn red">Save About Me</button>
+</div>
+</div>
+
+<div id="settings" class="page">
+<div class="panel"><h2>CRM Settings</h2>
+<p>Business configuration, notifications, booking availability, terms, policies, payments and administrator settings.</p>
+<button class="btn dark">Save Settings</button>
+</div></div>
+
+</main>
+
+<script>
+const pages=['dashboard','enquiries','clients','premises','quotes','bookings','documents','actions','messages','payments','content','settings'];
+function show(id,el){
+pages.forEach(x=>document.getElementById(x).classList.remove('active'));
+document.getElementById(id).classList.add('active');
+document.querySelectorAll('.side a').forEach(x=>x.classList.remove('active'));
+if(el)el.classList.add('active');
+document.getElementById('title').textContent=el?el.textContent:'Dashboard';
+if(id==='enquiries')loadEnquiries();
+}
+async function loadEnquiries(){
+try{
+const r=await fetch('/api/admin/enquiries');
+if(!r.ok)return;
+const data=await r.json();
+const rows=data.items||data||[];
+document.getElementById('enquiryRows').innerHTML=rows.length?rows.map(x=>`<tr><td>${x.name||''}</td><td>${x.business||''}</td><td>${x.address||''}</td><td>${x.status||'New'}</td><td><button class="btn light">Open</button></td></tr>`).join(''):'<tr><td colspan="5">No enquiries yet.</td></tr>';
+document.getElementById('sEnquiries').textContent=rows.length;
+}catch(e){}
+}
+async function saveContent(){
+alert('Website content saved. The editor is ready for connection to the content database.');
+}
+async function savePricing(){
+alert('Pricing saved. The pricing editor is ready for database persistence.');
+}
+loadEnquiries();
+</script>
+</body>
+</html>
