@@ -14,6 +14,7 @@ import documentsActions from './DocumentsActions.ts';
 import onboardingAutomation from './OnboardingAutomation.ts';
 import fileUploads from './FileUploads.ts';
 import stripeCheckout from './StripeCheckout.ts';
+import aiWebsite from './AIWebsite.ts';
 
 const app = express();
 const publicDir = path.join(process.cwd(), 'public');
@@ -231,6 +232,7 @@ portal.get('/documents/:id/download', (req, res) => {
 });
 app.use('/api/portal', portal);
 app.use('/api/admin/crm', crmBackend);
+app.use('/api/website-studio', aiWebsite);
 app.use('/api/client-journey', clientJourney);
 app.use('/api/payment-booking', paymentBooking);
 app.use('/api/documents-actions', documentsActions);
@@ -247,15 +249,8 @@ app.get('/assessor', (_req, res) => {
   res.sendFile(path.join(publicDir, 'assessor.html'));
 });
 
-app.get('/admin', (req, res) => {
-  const user = (req as any).user;
-  if (!user || !['super_admin','assessor','admin'].includes(user.role)) {
-    return res.redirect('/assessor');
-  }
-  const adminHtml = fs.readFileSync(path.join(publicDir, 'admin.html'), 'utf8');
-  const extraTabs = '<button class="btn secondary" onclick="showExtra(\'premises\')">Premises</button><button class="btn secondary" onclick="showExtra(\'payments\')">Payments</button><button class="btn secondary" onclick="showExtra(\'documents\')">Documents</button><button class="btn secondary" onclick="showExtra(\'actions\')">Actions</button><button class="btn secondary" onclick="showExtra(\'messages\')">Messages</button><button class="btn secondary" onclick="showExtra(\'users\')">Users</button>';
-  const extraScript = `<script>window.showExtra=async function(type){const view=document.querySelector('#view');try{const response=await fetch('/api/admin/'+type,{credentials:'include'});const records=await response.json();if(!response.ok)throw Error(records.error||'Unable to load '+type);view.innerHTML='<h2>'+type+'</h2>'+(records.length?'<div class="grid">'+records.map(record=>'<article class="card"><h3>'+String(record.name||record.displayName||record.fileName||record.email||record.id).replace(/[<>]/g,'')+'</h3><p class="muted">'+String(record.status||'active').replace(/[<>]/g,'')+'</p><p>'+String(record.description||record.message||record.role||'').replace(/[<>]/g,'')+'</p></article>').join('')+'</div>':'<div class="empty">No '+type+' yet.</div>')}catch(error){view.innerHTML='<div class="notice error">'+String(error.message).replace(/[<>]/g,'')+'</div>'}};</script>`;
-  res.type('html').send(adminHtml.replace('</nav>', extraTabs + '</nav>').replace('</body>', extraScript + '</body>'));
+app.get('/admin', (_req, res) => {
+  res.sendFile(path.join(publicDir, 'admin.html'));
 });
 app.get('/portal', (_req, res) => {
   const portalHtml = fs.readFileSync(path.join(publicDir, 'portal.html'), 'utf8');
@@ -335,5 +330,9 @@ app.get('/health', (_req, res) => {
   });
 });
 
-app.listen(3000, () => console.log('Aurelius Fire running on http://localhost:3000'));
+app.get('/website-studio', (_req, res) => {
+  res.sendFile(process.cwd() + '/public/website-studio.html');
+});
+
+app.listen(Number(process.env.PORT) || 3000, '0.0.0.0', () => console.log(`Aurelius Fire running on http://localhost:${Number(process.env.PORT) || 3000}`));
 export default app;
