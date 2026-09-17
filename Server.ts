@@ -19,6 +19,7 @@ import stripeCheckout from './StripeCheckout.ts';
 import aiWebsite from './AIWebsite.ts';
 import aiControl from './AIControl.ts';
 import productionWorkflow from './ProductionWorkflow.ts';
+import completionSuite from './CompletionSuite.ts';
 
 const app = express();
 const publicDir = path.join(process.cwd(), 'public');
@@ -146,6 +147,7 @@ app.get('/api/public/booking-availability', (req, res) => {
 
 app.use('/api/admin', authRequired, adminRoutes);
 app.use('/api/workflow', authRequired, productionWorkflow);
+app.use('/api/completion', authRequired, completionSuite);
 app.use('/api/client-portal', authRequired, clientPortal);
 app.use('/api/client-accounts', authRequired, clientAccounts);
 app.use('/api/ai', authRequired, aiControl);
