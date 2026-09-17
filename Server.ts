@@ -274,7 +274,7 @@ app.post('/api/public/enquiry', express.json({limit:'2mb'}), async (req, res) =>
       clientId:result.client.id,
       premiseId:result.premise.id,
       enquiryId:result.enquiry.id,
-      quote:result.quote?.price ? {
+      quote:result.quote?.amount ? {
         id:result.quote.id,
         service:result.quote.service,
         amount:result.quote.amount,

@@ -169,19 +169,7 @@ label{font-size:13px;font-weight:700}
 document.getElementById('year').textContent=new Date().getFullYear();
 function openQuote(){document.getElementById('quoteModal').classList.add('open')}
 function closeQuote(){document.getElementById('quoteModal').classList.remove('open')}
-document.getElementById('quoteForm').onsubmit=async e=>{
-e.preventDefault();
-const data=Object.fromEntries(new FormData(e.target));
-try{
-const r=await fetch('/api/quotes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-const j=await r.json();
-document.getElementById('quoteResult').innerHTML='<p><b>Enquiry submitted.</b> We will review the premises details and confirm the appropriate quote.</p>';
-e.target.style.display='none';
-}catch(err){
-document.getElementById('quoteResult').innerHTML='<p>Thank you. Your enquiry has been recorded.</p>';
-}
-};
-</script>
+
 
 <script id="aurelius-public-enquiry-handler">
 (function(){
@@ -205,20 +193,16 @@ document.getElementById('quoteResult').innerHTML='<p>Thank you. Your enquiry has
       name:data.name || data.clientName || '',
       email:data.email || data.emailAddress || '',
       phone:data.phone || data.telephone || '',
-      company:data.company || data.businessName || data.organisation || '',
-      businessName:data.businessName || data.company || '',
-      premiseName:data.premiseName || data.businessName || data.company || 'Premises',
+      company:data.company || data.business || data.businessName || data.organisation || '',
+      businessName:data.businessName || data.company || data.business || '',
+      premiseName:data.premiseName || data.businessName || data.company || data.business || 'Premises',
       address:data.address || data.siteAddress || '',
       postcode:data.postcode || data.postCode || '',
-      floors:data.floors || data.numberOfFloors || 1,
-      floorAreaSqFt:data.floorAreaSqFt || data.area || data.sizeSqFt || '',
-      useType:data.useType || data.businessType || data.premiseType || '',
+      floors:String(data.floors || data.numberOfFloors || '1').trim().toLowerCase() === '4+' ? 4 : (Number(data.floors || data.numberOfFloors || 1) || 1),
+      floorAreaSqFt:Number(String(data.floorAreaSqFt || data.area || data.sizeSqFt || data.size || '').replace(/[^0-9.]/g,'')) || '',
+      useType:data.useType || data.businessType || data.premiseType || data.type || '',
       occupancy:data.occupancy || '',
-      sleepingAccommodation:!!(
-        data.sleepingAccommodation ||
-        data.sleeping ||
-        data.hasSleepingAccommodation
-      ),
+      sleepingAccommodation:['yes','true','1'].includes(String(data.sleepingAccommodation || data.sleeping || data.hasSleepingAccommodation || '').trim().toLowerCase()),
       message:data.message || data.notes || data.enquiry || '',
       source:'website'
     };

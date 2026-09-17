@@ -45,8 +45,8 @@ export function workflowFor(clientId: string) {
 }
 
 export function ensureWorkflow(clientId: string, reqActor?: {id:string;role:string}) {
-  const existing = workflowFor(clientId);
-  if (existing.id && existing.stage) return existing;
+  const rows = listEntities('workflow', clientId, 'all');
+  if (rows[0]) return rows[0];
 
   return saveEntity(
     'workflow',
@@ -229,10 +229,21 @@ export function runClientAutomation(
   reqActor?: {id:string;role:string}
 ) {
   const c360 = client360(clientId);
-  let workflow = c360.workflow;
+  const current = c360.workflow;
+  const stage = current.stage;
 
   const quote = c360.quotes.find((q:any) =>
     ['accepted','approved'].includes(String(q.status).toLowerCase())
+  );
+
+  const termsSigned = c360.tasks.some((t:any) =>
+    String(t.type || '').toLowerCase() === 'terms' &&
+    ['completed','signed','accepted'].includes(String(t.status).toLowerCase())
+  );
+
+  const onboardingComplete = c360.tasks.some((t:any) =>
+    String(t.type || '').toLowerCase() === 'onboarding' &&
+    ['completed','complete','submitted'].includes(String(t.status).toLowerCase())
   );
 
   const paidInvoice = c360.invoices.find((i:any) =>
@@ -256,21 +267,43 @@ export function runClientAutomation(
     !['completed','closed'].includes(String(a.status).toLowerCase())
   );
 
-  if (finalReport && openActions.length === 0 && completedAssessment) {
-    workflow = advanceWorkflow(clientId, 'complete', reqActor, 'Report complete and no open actions');
-  } else if (finalReport) {
-    workflow = advanceWorkflow(clientId, 'actions', reqActor, 'Final report available');
-  } else if (completedAssessment) {
-    workflow = advanceWorkflow(clientId, 'report', reqActor, 'Assessment completed');
-  } else if (confirmedBooking) {
-    workflow = advanceWorkflow(clientId, 'assessment', reqActor, 'Booking confirmed');
-  } else if (paidInvoice) {
-    workflow = advanceWorkflow(clientId, 'ready_to_book', reqActor, 'Payment received');
-  } else if (quote) {
-    workflow = advanceWorkflow(clientId, 'accepted', reqActor, 'Quote accepted');
+  if (finalReport && completedAssessment && openActions.length === 0 && stage !== 'complete') {
+    return advanceWorkflow(clientId, 'complete', reqActor, 'Report complete and no open actions');
   }
 
-  return workflow;
+  if (finalReport && stage !== 'actions' && stage !== 'complete') {
+    return advanceWorkflow(clientId, 'actions', reqActor, 'Final report available');
+  }
+
+  if (completedAssessment && !finalReport && stage !== 'report') {
+    return advanceWorkflow(clientId, 'report', reqActor, 'Assessment completed');
+  }
+
+  if (confirmedBooking && !completedAssessment && stage !== 'assessment') {
+    return advanceWorkflow(clientId, 'assessment', reqActor, 'Booking confirmed');
+  }
+
+  if (paidInvoice && !['ready_to_book','booked','assessment','report','actions','complete'].includes(stage)) {
+    return advanceWorkflow(clientId, 'ready_to_book', reqActor, 'Payment received');
+  }
+
+  if (onboardingComplete && !paidInvoice && !['payment','ready_to_book','booked','assessment','report','actions','complete'].includes(stage)) {
+    return advanceWorkflow(clientId, 'payment', reqActor, 'Client onboarding completed; payment required');
+  }
+
+  if (termsSigned && !onboardingComplete && !['onboarding','payment','ready_to_book','booked','assessment','report','actions','complete'].includes(stage)) {
+    return advanceWorkflow(clientId, 'onboarding', reqActor, 'Terms signed; onboarding required');
+  }
+
+  if (quote && stage === 'accepted') {
+    return advanceWorkflow(clientId, 'terms', reqActor, 'Quote accepted; engagement terms required');
+  }
+
+  if (quote && stage === 'quote') {
+    return advanceWorkflow(clientId, 'accepted', reqActor, 'Quote accepted');
+  }
+
+  return current;
 }
 
 export function generateQuoteFromPremise(
@@ -397,10 +430,15 @@ export function createEnquiryPipeline(
 
   const quote = generateQuoteFromPremise(client.id, premise, reqActor);
 
-  const workflow = ensureWorkflow(client.id, reqActor);
+  let workflow = ensureWorkflow(client.id, reqActor);
 
-  if (quote?.price) {
-    advanceWorkflow(client.id, 'quote', reqActor, 'Automatic fixed quote generated');
+  if (quote?.amount) {
+    workflow = advanceWorkflow(
+      client.id,
+      'quote',
+      reqActor,
+      'Automatic fixed quote generated'
+    );
   }
 
   enqueueNotification(
