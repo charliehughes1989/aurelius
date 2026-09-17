@@ -40,12 +40,14 @@ export function workflowFor(clientId: string) {
     history: [],
     checklist: {},
     createdAt: now(),
-    updatedAt: now()
+    updatedAt: now(),
+    persisted: false
   };
 }
 
 export function ensureWorkflow(clientId: string, reqActor?: {id:string;role:string}) {
   const rows = listEntities('workflow', clientId, 'all');
+
   if (rows[0]) return rows[0];
 
   return saveEntity(
@@ -57,11 +59,27 @@ export function ensureWorkflow(clientId: string, reqActor?: {id:string;role:stri
       history: [],
       checklist: {},
       createdAt: now(),
-      updatedAt: now()
+      updatedAt: now(),
+      persisted: true
     },
     reqActor,
     'workflow_created'
   );
+}
+
+export function syncClientWorkflow(
+  clientId: string,
+  stage: WorkflowStage,
+  reqActor?: {id:string;role:string},
+  reason = ''
+) {
+  const current = ensureWorkflow(clientId, reqActor);
+
+  if (current.stage === stage) {
+    return current;
+  }
+
+  return advanceWorkflow(clientId, stage, reqActor, reason);
 }
 
 export function advanceWorkflow(
@@ -431,7 +449,7 @@ export function createEnquiryPipeline(
   let workflow = ensureWorkflow(client.id, reqActor);
 
   if (quote?.amount) {
-    workflow = advanceWorkflow(
+    workflow = syncClientWorkflow(
       client.id,
       'quote',
       reqActor,

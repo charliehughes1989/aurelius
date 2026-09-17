@@ -1,3 +1,4 @@
+import { syncClientWorkflow, ensureWorkflow } from './AutomationEngine.ts';
 import { Router } from 'express';
 import { db, now } from './database.ts';
 
@@ -67,6 +68,17 @@ router.post('/quote/:id/accept', (req, res) => {
     },
     'accepted'
   );
+
+  try {
+    if (clientId) {
+      syncClientWorkflow(
+        clientId,
+        'accepted',
+        undefined,
+        'Quote accepted by client'
+      );
+    }
+  } catch (_) {}
 
   res.json({
     success: true,
@@ -197,6 +209,17 @@ router.post('/terms/sign', (req, res) => {
     },
     'terms_signed'
   );
+
+  try {
+    if (clientId) {
+      syncClientWorkflow(
+        clientId,
+        'onboarding',
+        undefined,
+        'Engagement terms signed'
+      );
+    }
+  } catch (_) {}
 
   res.json({
     success: true,
