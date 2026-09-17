@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurelius Fire Risk | Assessor Login</title>
+<meta name="description" content="Aurelius Fire Risk assessor and administration portal.">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#f5f7fa;color:#172033}
+body{display:flex;align-items:center;justify-content:center;padding:24px}
+.login-wrap{width:100%;max-width:460px}
+.brand{text-align:center;margin-bottom:28px}
+.brand-mark{width:64px;height:64px;margin:0 auto 16px;border-radius:18px;background:#c62828;color:#fff;display:flex;align-items:center;justify-content:center;font-size:27px;font-weight:800;box-shadow:0 10px 30px rgba(198,40,40,.2)}
+.brand h1{margin:0;font-size:28px;letter-spacing:-.7px}
+.brand p{margin:8px 0 0;color:#687386;font-size:14px}
+.card{background:#fff;border:1px solid #e2e7ee;border-radius:20px;padding:32px;box-shadow:0 18px 55px rgba(20,35,60,.08)}
+.card h2{margin:0 0 7px;font-size:22px}
+.card .intro{margin:0 0 24px;color:#687386;font-size:14px;line-height:1.5}
+label{display:block;font-size:13px;font-weight:700;margin:0 0 7px}
+.field{margin-bottom:18px}
+input{width:100%;height:48px;border:1px solid #d7dde6;border-radius:10px;padding:0 14px;font-size:15px;outline:none;background:#fff}
+input:focus{border-color:#155eef;box-shadow:0 0 0 3px rgba(21,94,239,.1)}
+button{width:100%;height:50px;border:0;border-radius:10px;background:#155eef;color:#fff;font-size:15px;font-weight:750;cursor:pointer}
+button:hover{background:#0d4fc7}
+button:disabled{opacity:.65;cursor:wait}
+.notice{display:none;padding:12px 14px;border-radius:10px;margin-bottom:18px;font-size:14px;line-height:1.4}
+.notice.error{display:block;background:#fff0f0;color:#a61b1b;border:1px solid #f1c4c4}
+.notice.success{display:block;background:#effaf2;color:#176b2c;border:1px solid #bfe3c7}
+.footer{text-align:center;margin-top:20px;color:#7a8494;font-size:12px}
+.footer a{color:#155eef;text-decoration:none}
+.setup{display:none;margin-top:25px;padding-top:22px;border-top:1px solid #e8ebf0}
+.setup h3{margin:0 0 7px;font-size:16px}
+.setup p{margin:0 0 15px;color:#687386;font-size:13px;line-height:1.45}
+.secondary{background:#fff;color:#155eef;border:1px solid #cfd8e6;margin-top:10px}
+.secondary:hover{background:#f4f7fb}
+.small{font-size:12px;color:#7a8494;margin-top:12px;line-height:1.45}
+</style>
+</head>
+<body>
+
+<div class="login-wrap">
+
+  <div class="brand">
+    <div class="brand-mark">A</div>
+    <h1>Aurelius Fire Risk</h1>
+    <p>Assessor & Administration Portal</p>
+  </div>
+
+  <div class="card">
+
+    <h2>Assessor login</h2>
+    <p class="intro">Sign in to manage clients, premises, enquiries, assessments, documents, bookings, payments and website content.</p>
+
+    <div id="notice" class="notice"></div>
+
+    <form id="loginForm">
+
+      <div class="field">
+        <label for="email">Email address</label>
+        <input id="email" type="email" autocomplete="username" required placeholder="you@example.com">
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" required placeholder="Enter your password">
+      </div>
+
+      <button id="loginButton" type="submit">Sign in to Assessor Portal</button>
+
+    </form>
+
+    <div id="setup" class="setup">
+      <h3>First-time setup</h3>
+      <p>No administrator account has been configured yet. Create the initial administrator account below.</p>
+
+      <form id="setupForm">
+
+        <div class="field">
+          <label for="setupName">Your name</label>
+          <input id="setupName" required placeholder="Charlie Hughes">
+        </div>
+
+        <div class="field">
+          <label for="setupEmail">Administrator email</label>
+          <input id="setupEmail" type="email" required placeholder="you@example.com">
+        </div>
+
+        <div class="field">
+          <label for="setupPassword">Administrator password</label>
+          <input id="setupPassword" type="password" minlength="8" required placeholder="Minimum 8 characters">
+        </div>
+
+        <button type="submit">Create Administrator</button>
+
+      </form>
+    </div>
+
+    <p class="small">
+      Authorised Aurelius Fire Risk assessors and administrators only.
+    </p>
+
+  </div>
+
+  <div class="footer">
+    <a href="/">← Return to Aurelius Fire Risk website</a>
+  </div>
+
+</div>
+
+<script>
+const notice = document.getElementById('notice');
+
+function showNotice(message,type='error'){
+  notice.textContent=message;
+  notice.className='notice '+type;
+}
+
+async function checkExistingSession(){
+  try{
+    const r=await fetch('/api/auth/me',{credentials:'include'});
+    if(r.ok){
+      const data=await r.json();
+      if(data && data.user){
+        const role=data.user.role;
+        if(['super_admin','assessor','admin'].includes(role)){
+          window.location.href='/admin';
+        }
+      }
+    }
+  }catch(e){}
+}
+
+async function checkSetup(){
+  try{
+    const r=await fetch('/api/auth/status',{credentials:'include'});
+    if(r.ok){
+      const data=await r.json();
+      if(data && data.setupRequired){
+        document.getElementById('setup').style.display='block';
+      }
+    }
+  }catch(e){}
+}
+
+document.getElementById('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+
+  const button=document.getElementById('loginButton');
+  button.disabled=true;
+  button.textContent='Signing in…';
+  showNotice('');
+
+  try{
+    const r=await fetch('/api/auth/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body:JSON.stringify({
+        email:document.getElementById('email').value.trim(),
+        password:document.getElementById('password').value
+      })
+    });
+
+    const data=await r.json().catch(()=>({}));
+
+    if(!r.ok){
+      throw new Error(data.error || 'Invalid email or password.');
+    }
+
+    const role=data.user && data.user.role;
+
+    if(!['super_admin','assessor','admin'].includes(role)){
+      await fetch('/api/auth/logout',{method:'POST',credentials:'include'});
+      throw new Error('This account does not have assessor portal access.');
+    }
+
+    showNotice('Login successful. Opening assessor portal…','success');
+    setTimeout(()=>window.location.href='/admin',250);
+
+  }catch(error){
+    showNotice(error.message || 'Unable to sign in.');
+    button.disabled=false;
+    button.textContent='Sign in to Assessor Portal';
+  }
+});
+
+document.getElementById('setupForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+
+  try{
+    const r=await fetch('/api/auth/setup',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body:JSON.stringify({
+        email:document.getElementById('setupEmail').value.trim(),
+        password:document.getElementById('setupPassword').value,
+        displayName:document.getElementById('setupName').value.trim()
+      })
+    });
+
+    const data=await r.json().catch(()=>({}));
+
+    if(!r.ok){
+      throw new Error(data.error || 'Unable to create administrator.');
+    }
+
+    showNotice('Administrator created. You can now sign in.','success');
+    document.getElementById('setup').style.display='none';
+    document.getElementById('email').value=document.getElementById('setupEmail').value;
+    document.getElementById('password').value='';
+    document.getElementById('password').focus();
+
+  }catch(error){
+    showNotice(error.message || 'Unable to create administrator.');
+  }
+});
+
+checkExistingSession();
+checkSetup();
+</script>
+
+</body>
+</html>

@@ -1040,5 +1040,74 @@ function saveSettings(x){localStorage.setItem('af_website',JSON.stringify({name:
 renderAll();
 </script>
 
+
+<div id="assessorIdentity" style="
+position:fixed;
+right:18px;
+top:14px;
+z-index:9999;
+display:flex;
+align-items:center;
+gap:10px;
+background:#fff;
+border:1px solid #dfe5ed;
+border-radius:12px;
+padding:7px 9px 7px 12px;
+box-shadow:0 8px 25px rgba(20,35,60,.10);
+font-size:13px;
+">
+  <span id="assessorName" style="font-weight:700">Assessor</span>
+  <span id="assessorRole" style="color:#718096"></span>
+  <button id="assessorLogout" type="button" style="
+  border:1px solid #d8dee8;
+  background:#fff;
+  color:#b42318;
+  border-radius:8px;
+  padding:7px 10px;
+  font-weight:700;
+  cursor:pointer;
+  ">Log out</button>
+</div>
+
+<script>
+(async function(){
+  try{
+    const r=await fetch('/api/auth/me',{credentials:'include'});
+    if(!r.ok){
+      window.location.href='/assessor';
+      return;
+    }
+
+    const data=await r.json();
+    const user=data.user||{};
+    const allowed=['super_admin','assessor','admin'];
+
+    if(!allowed.includes(user.role)){
+      window.location.href='/assessor';
+      return;
+    }
+
+    document.getElementById('assessorName').textContent=
+      user.displayName || user.email || 'Assessor';
+
+    document.getElementById('assessorRole').textContent=
+      user.role==='super_admin' ? 'Administrator' :
+      user.role==='assessor' ? 'Assessor' : 'Admin';
+
+  }catch(error){
+    window.location.href='/assessor';
+  }
+})();
+
+document.getElementById('assessorLogout').addEventListener('click',async function(){
+  try{
+    await fetch('/api/auth/logout',{
+      method:'POST',
+      credentials:'include'
+    });
+  }catch(e){}
+  window.location.href='/assessor';
+});
+</script>
 </body>
 </html>

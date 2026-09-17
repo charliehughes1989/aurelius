@@ -48,6 +48,35 @@ app.post('/api/auth/login', (req, res) => {
   if (!result) return res.status(401).json({ error: 'Invalid email or password' });
   setSession(res, result.token); res.json({ user: result.user });
 });
+
+app.get('/api/auth/status', (_req, res) => {
+  try {
+    const rows = db.prepare(
+      "SELECT COUNT(*) AS count FROM users WHERE role IN ('super_admin','assessor','admin') AND status = 'active'"
+    ).get() as any;
+
+    res.json({
+      setupRequired: Number(rows?.count || 0) === 0
+    });
+  } catch (error) {
+    res.json({ setupRequired: false });
+  }
+});
+
+app.get('/api/auth/me', authRequired, (req, res) => {
+  res.json({ user: (req as any).user });
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  try {
+    const token = req.cookies?.session;
+    if (token) removeSession(token);
+  } catch (_) {}
+
+  clearSession(req);
+  res.json({ ok: true });
+});
+
 app.post('/api/auth/logout', authRequired, (req, res) => { clearSession(req); writeAudit({ actorId: (req as any).user.id, actorRole: (req as any).user.role, action: 'logout', entityType: 'auth', entityId: (req as any).user.id }); removeSession(res); res.json({ ok: true }); });
 app.get('/api/auth/me', authRequired, (req, res) => res.json({ user: (req as any).user }));
 
@@ -214,7 +243,15 @@ app.get('/', (_req, res) => {
   html = html.replaceAll('onclick="openBooking()"', 'onclick="location.href=\'/booking.html\'"').replaceAll('href="#terms"', 'href="/terms.html"').replaceAll('href="#privacy"', 'href="/privacy.html"').replaceAll('href="#cookies"', 'href="/cookies.html"').replaceAll('href="#about"', 'href="/about.html"');
   res.type('html').send(html);
 });
-app.get('/admin', (_req, res) => {
+app.get('/assessor', (_req, res) => {
+  res.sendFile(path.join(publicDir, 'assessor.html'));
+});
+
+app.get('/admin', (req, res) => {
+  const user = (req as any).user;
+  if (!user || !['super_admin','assessor','admin'].includes(user.role)) {
+    return res.redirect('/assessor');
+  }
   const adminHtml = fs.readFileSync(path.join(publicDir, 'admin.html'), 'utf8');
   const extraTabs = '<button class="btn secondary" onclick="showExtra(\'premises\')">Premises</button><button class="btn secondary" onclick="showExtra(\'payments\')">Payments</button><button class="btn secondary" onclick="showExtra(\'documents\')">Documents</button><button class="btn secondary" onclick="showExtra(\'actions\')">Actions</button><button class="btn secondary" onclick="showExtra(\'messages\')">Messages</button><button class="btn secondary" onclick="showExtra(\'users\')">Users</button>';
   const extraScript = `<script>window.showExtra=async function(type){const view=document.querySelector('#view');try{const response=await fetch('/api/admin/'+type,{credentials:'include'});const records=await response.json();if(!response.ok)throw Error(records.error||'Unable to load '+type);view.innerHTML='<h2>'+type+'</h2>'+(records.length?'<div class="grid">'+records.map(record=>'<article class="card"><h3>'+String(record.name||record.displayName||record.fileName||record.email||record.id).replace(/[<>]/g,'')+'</h3><p class="muted">'+String(record.status||'active').replace(/[<>]/g,'')+'</p><p>'+String(record.description||record.message||record.role||'').replace(/[<>]/g,'')+'</p></article>').join('')+'</div>':'<div class="empty">No '+type+' yet.</div>')}catch(error){view.innerHTML='<div class="notice error">'+String(error.message).replace(/[<>]/g,'')+'</div>'}};</script>`;
