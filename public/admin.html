@@ -124,13 +124,15 @@ tr:hover td{background:#fbfcff}
     <strong>AURELIUS</strong>
     <span>FIRE RISK · ASSESSOR CRM</span>
   </div>
-  <nav class="nav">
+  <button class="nav-item" data-page="workflow">Operational Workflow</button>
+<nav class="nav">
     <div class="section">Overview</div>
     <button data-page="dashboard" class="active">▦ Dashboard</button>
 
     <div class="section">Sales & Clients</div>
     <button data-page="enquiries">☏ Enquiries</button>
     <button data-page="clients">♙ Clients</button>
+    <button data-page="clientaccounts">▣ Client Portal Accounts</button>
     <button data-page="premises">⌂ Premises</button>
     <button data-page="quotes">£ Quotes</button>
     <button data-page="bookings">◷ Bookings</button>
@@ -198,6 +200,7 @@ tr:hover td{background:#fbfcff}
 
 <section id="page-enquiries" class="page"><div id="generic-enquiries"></div></section>
 <section id="page-clients" class="page"><div id="generic-clients"></div></section>
+<section id="page-clientaccounts" class="page"><div id="generic-clientaccounts"></div></section>
 <section id="page-premises" class="page"><div id="generic-premises"></div></section>
 <section id="page-quotes" class="page"><div id="generic-quotes"></div></section>
 <section id="page-bookings" class="page"><div id="generic-bookings"></div></section>
@@ -405,6 +408,150 @@ async function loadDashboard(){
 async function getEntities(type){
  const r=await api('/api/admin/crm/entities/'+encodeURIComponent(type));
  return Array.isArray(r)?r:(r.items||r.entities||r.data||[]);
+}
+
+
+async function renderClientAccounts(){
+ const target=document.getElementById('generic-clientaccounts');
+ target.innerHTML='<div class="panel"><div class="loading">Loading client portal accounts…</div></div>';
+
+ try{
+   const clients=await getEntities('client');
+
+   target.innerHTML=`
+   <div class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Client Portal Accounts</h2>
+        <div style="font-size:12px;color:var(--muted)">
+          Link CRM clients to secure client portal access.
+        </div>
+      </div>
+      <button class="btn" onclick="renderClientAccounts()">Refresh</button>
+    </div>
+
+    <div class="table-wrap">
+     <table>
+      <thead>
+       <tr>
+        <th>Client</th>
+        <th>Email</th>
+        <th>Portal</th>
+        <th>Premises</th>
+        <th>Actions</th>
+       </tr>
+      </thead>
+      <tbody>
+       ${clients.length ? clients.map(r=>{
+         const d=r.data||r;
+         const id=r.id||d.id||'';
+         return `
+         <tr>
+          <td><b>${esc(d.name||d.company||'Unnamed client')}</b></td>
+          <td>${esc(d.email||d.portal_email||'—')}</td>
+          <td>${badge(d.portal_status||'Not linked')}</td>
+          <td>${esc(d.portal_premises_count||'—')}</td>
+          <td>
+           <button class="btn small primary"
+             onclick="createClientPortal('${esc(id)}')">
+             ${d.portal_account_id?'Manage':'Create Portal'}
+           </button>
+           ${d.portal_account_id?`
+           <button class="btn small"
+             onclick="resetClientPortal('${esc(id)}')">
+             Reset Invite
+           </button>`:''}
+          </td>
+         </tr>`;
+       }).join('') : `
+         <tr><td colspan="5" class="empty">No clients yet.</td></tr>
+       `}
+      </tbody>
+     </table>
+    </div>
+   </div>`;
+ }catch(e){
+   target.innerHTML=`<div class="panel"><div class="empty">${esc(e.message)}</div></div>`;
+ }
+}
+
+async function createClientPortal(clientId){
+ try{
+   const email=prompt('Client email address (leave blank to use the email stored on the CRM client):','');
+
+   const body={};
+   if(email)body.email=email;
+
+   const r=await api(
+     '/api/client-accounts/client/'+encodeURIComponent(clientId)+'/create',
+     {
+       method:'POST',
+       body:JSON.stringify(body)
+     }
+   );
+
+   if(r.temporary_password){
+     document.getElementById('modalTitle').textContent='Client Portal Account Created';
+     document.getElementById('modalBody').innerHTML=`
+       <div class="notice">
+         Give the temporary password to the client securely. It should not be emailed in plain text.
+       </div>
+       <div class="field">
+         <label>Portal Email</label>
+         <input readonly value="${esc(r.account?.email||r.email||'')}">
+       </div>
+       <div class="field">
+         <label>Temporary Password</label>
+         <input readonly value="${esc(r.temporary_password)}">
+       </div>
+       <div style="display:flex;justify-content:flex-end;gap:8px">
+         <button class="btn" onclick="closeModal()">Close</button>
+       </div>`;
+     openModal();
+   }else{
+     alert('Client portal account linked.');
+   }
+
+   renderClientAccounts();
+
+ }catch(e){
+   alert('Unable to create portal account: '+e.message);
+ }
+}
+
+async function resetClientPortal(clientId){
+ if(!confirm('Reset this client portal invitation and create a new temporary password?'))return;
+
+ try{
+   const r=await api(
+     '/api/client-accounts/client/'+encodeURIComponent(clientId)+'/reset-invite',
+     {
+       method:'POST',
+       body:'{}'
+     }
+   );
+
+   document.getElementById('modalTitle').textContent='New Client Invitation';
+   document.getElementById('modalBody').innerHTML=`
+     <div class="notice">
+       This temporary password is shown once. Provide it securely to the client.
+     </div>
+     <div class="field">
+       <label>Email</label>
+       <input readonly value="${esc(r.email||'')}">
+     </div>
+     <div class="field">
+       <label>Temporary Password</label>
+       <input readonly value="${esc(r.temporary_password||'')}">
+     </div>
+     <button class="btn" onclick="closeModal()">Close</button>`;
+
+   openModal();
+   renderClientAccounts();
+
+ }catch(e){
+   alert(e.message);
+ }
 }
 
 async function renderEntityPage(page){
@@ -721,5 +868,210 @@ document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='
 checkAuth();
 loadDashboard();
 </script>
+
+<section id="page-workflow" class="page" style="display:none">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px">
+    <div>
+      <h1 style="margin:0">Operational Workflow</h1>
+      <p style="margin:6px 0 0;color:#64748b">
+        End-to-end client journey from enquiry through assessment, payment, report and actions.
+      </p>
+    </div>
+    <button onclick="loadOperationalWorkflow()" class="primary-btn">Refresh</button>
+  </div>
+
+  <div id="workflowStageCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px"></div>
+
+  <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:20px">
+    <h2 style="margin-top:0">Client workflow</h2>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <input id="workflowClientSearch" placeholder="Search client name, email or ID..." style="flex:1;padding:11px;border:1px solid #cbd5e1;border-radius:8px">
+      <button onclick="searchWorkflowClients()" class="primary-btn">Search</button>
+    </div>
+    <div id="workflowClientResults"></div>
+  </div>
+
+  <div id="workflowClientPanel" style="margin-top:20px"></div>
+</section>
+
+
+<script>
+async function workflowFetch(url, options = {}) {
+  const response = await fetch(url, {
+    credentials: 'same-origin',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    },
+    ...options
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.error || `Request failed: ${response.status}`);
+  }
+
+  return data;
+}
+
+async function loadOperationalWorkflow() {
+  const root = document.getElementById('workflowStageCards');
+  if (!root) return;
+
+  root.innerHTML = '<div>Loading workflow...</div>';
+
+  try {
+    const data = await workflowFetch('/api/workflow/summary');
+
+    const cards = [
+      ['Clients', data.counts.clients],
+      ['Enquiries', data.counts.enquiries],
+      ['Quotes', data.counts.quotes],
+      ['Bookings', data.counts.upcomingBookings],
+      ['Assessments', data.counts.assessments],
+      ['Unpaid', data.counts.unpaidInvoices],
+      ['Open Actions', data.counts.openActions],
+      ['Reports', data.counts.documents]
+    ];
+
+    root.innerHTML = cards.map(([label, value]) => `
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:14px;padding:16px">
+        <div style="font-size:12px;color:#64748b">${label}</div>
+        <div style="font-size:28px;font-weight:800;margin-top:5px">${value ?? 0}</div>
+      </div>
+    `).join('');
+  } catch (e) {
+    root.innerHTML = `<div style="color:#b91c1c">${e.message}</div>`;
+  }
+}
+
+async function searchWorkflowClients() {
+  const q = document.getElementById('workflowClientSearch')?.value || '';
+  const root = document.getElementById('workflowClientResults');
+
+  if (!root) return;
+
+  root.innerHTML = 'Searching...';
+
+  try {
+    const data = await workflowFetch('/api/workflow/search?q=' + encodeURIComponent(q));
+    const clients = (data.results || []).filter(x => x.type === 'client');
+
+    if (!clients.length) {
+      root.innerHTML = '<div style="color:#64748b">No clients found.</div>';
+      return;
+    }
+
+    root.innerHTML = clients.map(item => {
+      const d = item.data || {};
+      return `
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e2e8f0;padding:13px 0;gap:10px">
+          <div>
+            <strong>${escapeHtmlWorkflow(d.name || d.company_name || d.company || item.id)}</strong>
+            <div style="font-size:13px;color:#64748b">${escapeHtmlWorkflow(d.email || '')}</div>
+          </div>
+          <button class="primary-btn" onclick="openWorkflowClient('${item.id}')">Open 360</button>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    root.innerHTML = `<div style="color:#b91c1c">${e.message}</div>`;
+  }
+}
+
+async function openWorkflowClient(clientId) {
+  const root = document.getElementById('workflowClientPanel');
+  if (!root) return;
+
+  root.innerHTML = 'Loading client...';
+
+  try {
+    const [full, status] = await Promise.all([
+      workflowFetch('/api/workflow/client/' + encodeURIComponent(clientId) + '/360'),
+      workflowFetch('/api/workflow/client/' + encodeURIComponent(clientId) + '/status')
+    ]);
+
+    const c = full.client?.data || full.client || {};
+    const checklist = status.checklist || {};
+
+    const steps = [
+      ['Enquiry', checklist.enquiry],
+      ['Quote', checklist.quote],
+      ['Quote accepted', checklist.quoteAccepted],
+      ['Onboarding', checklist.onboarding],
+      ['Terms signed', checklist.termsSigned],
+      ['Booking', checklist.booking],
+      ['Payment', checklist.payment],
+      ['Final report', checklist.finalReport]
+    ];
+
+    root.innerHTML = `
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:22px">
+        <div style="display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap">
+          <div>
+            <h2 style="margin:0">${escapeHtmlWorkflow(c.name || c.company_name || c.company || clientId)}</h2>
+            <p style="margin:5px 0;color:#64748b">${escapeHtmlWorkflow(c.email || '')}</p>
+          </div>
+          <div style="font-weight:800;text-transform:uppercase;font-size:12px;background:#eff6ff;padding:9px 12px;border-radius:999px">
+            ${escapeHtmlWorkflow(status.stage || 'new')}
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:20px">
+          ${steps.map(([name, done]) => `
+            <div style="padding:13px;border-radius:10px;border:1px solid ${done ? '#86efac' : '#e2e8f0'};background:${done ? '#f0fdf4' : '#f8fafc'}">
+              <div style="font-size:13px;font-weight:700">${done ? '✓' : '○'} ${name}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;margin-top:22px">
+          ${workflowMiniCard('Premises', full.premises)}
+          ${workflowMiniCard('Quotes', full.quotes)}
+          ${workflowMiniCard('Bookings', full.bookings)}
+          ${workflowMiniCard('Invoices', full.invoices)}
+          ${workflowMiniCard('Documents', full.documents)}
+          ${workflowMiniCard('Actions', full.actions)}
+          ${workflowMiniCard('Messages', full.messages)}
+          ${workflowMiniCard('Payments', full.payments)}
+        </div>
+      </div>
+    `;
+  } catch (e) {
+    root.innerHTML = `<div style="background:#fef2f2;color:#991b1b;padding:16px;border-radius:10px">${e.message}</div>`;
+  }
+}
+
+function workflowMiniCard(title, items) {
+  return `
+    <div style="border:1px solid #e2e8f0;border-radius:12px;padding:15px">
+      <div style="font-weight:800">${title}</div>
+      <div style="font-size:28px;font-weight:800;margin-top:5px">${(items || []).length}</div>
+    </div>
+  `;
+}
+
+function escapeHtmlWorkflow(value) {
+  return String(value ?? '')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'","&#039;");
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const workflowButton = document.querySelector('[data-page="workflow"]');
+    if (workflowButton) {
+      workflowButton.addEventListener('click', () => {
+        setTimeout(loadOperationalWorkflow, 50);
+      });
+    }
+  }, 500);
+});
+</script>
+
 </body>
 </html>

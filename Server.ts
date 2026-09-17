@@ -1,4 +1,6 @@
 import express from 'express';
+import clientPortal from './ClientPortal.ts';
+import clientAccounts from './ClientAccounts.ts';
 import crmBackend from './CRMBackend.ts';
 import clientJourney from './ClientJourney.ts';
 import paymentBooking from './PaymentBooking.ts';
@@ -16,6 +18,7 @@ import fileUploads from './FileUploads.ts';
 import stripeCheckout from './StripeCheckout.ts';
 import aiWebsite from './AIWebsite.ts';
 import aiControl from './AIControl.ts';
+import productionWorkflow from './ProductionWorkflow.ts';
 
 const app = express();
 const publicDir = path.join(process.cwd(), 'public');
@@ -142,6 +145,9 @@ app.get('/api/public/booking-availability', (req, res) => {
 });
 
 app.use('/api/admin', authRequired, adminRoutes);
+app.use('/api/workflow', authRequired, productionWorkflow);
+app.use('/api/client-portal', authRequired, clientPortal);
+app.use('/api/client-accounts', authRequired, clientAccounts);
 app.use('/api/ai', authRequired, aiControl);
 const portal = express.Router();
 portal.use(authRequired);
