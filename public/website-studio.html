@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurelius Website Studio</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f7fb;color:#172033;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{height:68px;background:#fff;border-bottom:1px solid #e5eaf1;display:flex;align-items:center;padding:0 24px;gap:18px;position:sticky;top:0;z-index:20}
+.logo{font-weight:800;font-size:18px}
+.logo span{color:#c91f2b}
+.badge{font-size:12px;background:#eef4ff;color:#315ea8;padding:7px 10px;border-radius:20px;font-weight:700}
+.spacer{flex:1}
+button{border:0;border-radius:9px;padding:10px 15px;font-weight:700;cursor:pointer}
+.primary{background:#172033;color:#fff}
+.red{background:#c91f2b;color:#fff}
+.light{background:#edf1f6;color:#172033}
+.main{padding:22px;max-width:1800px;margin:auto}
+.grid{display:grid;grid-template-columns:380px 1fr;gap:18px}
+.card{background:#fff;border:1px solid #e3e8ef;border-radius:14px;padding:18px;box-shadow:0 4px 18px rgba(20,35,55,.04)}
+h1{margin:0 0 6px;font-size:24px}
+h2{font-size:16px;margin:0 0 12px}
+p{color:#667085;font-size:13px;line-height:1.55}
+textarea{width:100%;min-height:220px;border:1px solid #d8dee8;border-radius:10px;padding:12px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
+#htmlEditor{min-height:600px}
+#instruction{min-height:150px;font-family:Inter,system-ui,sans-serif}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.status{font-size:12px;margin-top:10px;padding:10px;border-radius:8px;background:#f3f5f8}
+iframe{width:100%;height:720px;border:1px solid #dfe5ec;border-radius:10px;background:#fff}
+.small{font-size:11px;color:#7b8494}
+.backups{max-height:180px;overflow:auto;margin-top:10px}
+.backup{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #edf0f4;font-size:11px}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}iframe{height:600px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">AURELIUS <span>FIRE</span></div>
+  <div class="badge">Website Studio</div>
+  <div class="spacer"></div>
+  <button class="light" onclick="location.href='/admin'">← Admin CRM</button>
+  <button class="light" onclick="window.open('/','_blank')">View Website</button>
+  <button class="red" onclick="logout()">Logout</button>
+</header>
+
+<div class="main">
+  <div class="card" style="margin-bottom:18px">
+    <h1>Website Studio</h1>
+    <p>
+      Edit the live homepage without using the terminal. You can directly edit
+      the HTML, preview it, save it, restore previous versions, or ask the AI
+      website builder to make changes for you.
+    </p>
+  </div>
+
+  <div class="grid">
+
+    <div>
+
+      <div class="card">
+        <h2>AI Website Builder</h2>
+        <p>
+          Tell the AI what you want changed. It will work from the current
+          homepage and return a complete improved version.
+        </p>
+
+        <textarea id="instruction" placeholder="Example:
+Make the homepage look more premium and professional.
+
+Or:
+Change the Small FRA price to £375.
+
+Or:
+Add a clear section explaining exactly what is included in a Type 1 non-intrusive FRA.
+
+Or:
+Make the website much better on mobile and improve the calls to action."></textarea>
+
+        <div class="actions">
+          <button class="primary" onclick="runAI()">Ask AI to Make Changes</button>
+        </div>
+
+        <div id="aiStatus" class="status">Ready.</div>
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <h2>Direct Website Editor</h2>
+        <p>
+          This is the actual homepage HTML. Anything can be edited here.
+          Always preview before saving.
+        </p>
+
+        <textarea id="htmlEditor"></textarea>
+
+        <div class="actions">
+          <button class="primary" onclick="preview()">Preview Changes</button>
+          <button class="red" onclick="saveWebsite()">Save Live Website</button>
+          <button class="light" onclick="loadWebsite()">Discard Changes</button>
+        </div>
+
+        <div id="saveStatus" class="status">Loading website...</div>
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <h2>Website Backups</h2>
+        <p>Every save creates a backup before changing the live homepage.</p>
+        <div id="backups" class="backups"></div>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <h2>Live Preview</h2>
+      <iframe id="previewFrame" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+    </div>
+
+  </div>
+</div>
+
+<script>
+async function api(url, options={}) {
+  const r = await fetch(url, {
+    credentials:'same-origin',
+    headers:{'Content-Type':'application/json',...(options.headers||{})},
+    ...options
+  });
+
+  if(r.status===401 || r.status===403) {
+    location.href='/assessor';
+    throw new Error('Authentication required');
+  }
+
+  const text=await r.text();
+
+  let data;
+  try{data=JSON.parse(text)}
+  catch{throw new Error(text || 'Request failed')}
+
+  if(!r.ok) throw new Error(data.error || 'Request failed');
+
+  return data;
+}
+
+async function checkLogin(){
+  try{
+    const r=await fetch('/api/auth/me',{credentials:'same-origin'});
+    if(!r.ok){location.href='/assessor';return false}
+    const user=await r.json();
+
+    if(!['super_admin','admin','assessor'].includes(user.user?.role)){
+      location.href='/assessor';
+      return false;
+    }
+
+    return true;
+  }catch(e){
+    location.href='/assessor';
+    return false;
+  }
+}
+
+async function loadWebsite(){
+  try{
+    const data=await api('/api/website-studio/website/source');
+    document.getElementById('htmlEditor').value=data.html;
+    document.getElementById('saveStatus').textContent='Website loaded.';
+    preview();
+    loadBackups();
+  }catch(e){
+    document.getElementById('saveStatus').textContent=e.message;
+  }
+}
+
+function preview(){
+  const html=document.getElementById('htmlEditor').value;
+  document.getElementById('previewFrame').srcdoc=html;
+  document.getElementById('saveStatus').textContent='Preview updated. The live website has not changed.';
+}
+
+async function saveWebsite(){
+  const html=document.getElementById('htmlEditor').value;
+
+  if(!confirm('Save this version as the LIVE homepage? A backup will be created first.')) return;
+
+  try{
+    const data=await api('/api/website-studio/website/save',{
+      method:'POST',
+      body:JSON.stringify({html})
+    });
+
+    document.getElementById('saveStatus').textContent='LIVE WEBSITE SAVED. Backup created.';
+    loadBackups();
+  }catch(e){
+    document.getElementById('saveStatus').textContent='Save failed: '+e.message;
+  }
+}
+
+async function runAI(){
+  const instruction=document.getElementById('instruction').value.trim();
+
+  if(!instruction){
+    alert('Tell the AI what you want changed first.');
+    return;
+  }
+
+  const status=document.getElementById('aiStatus');
+
+  status.textContent='AI is working on the website...';
+
+  try{
+    const data=await api('/api/website-studio/ai/website',{
+      method:'POST',
+      body:JSON.stringify({instruction})
+    });
+
+    document.getElementById('htmlEditor').value=data.html;
+    preview();
+
+    status.textContent='AI has prepared the changes. Review the preview, then click "Save Live Website" to publish them.';
+  }catch(e){
+    status.textContent='AI error: '+e.message;
+  }
+}
+
+async function loadBackups(){
+  try{
+    const data=await api('/api/website-studio/website/backups');
+
+    const el=document.getElementById('backups');
+
+    if(!data.backups.length){
+      el.innerHTML='<div class="small">No backups yet.</div>';
+      return;
+    }
+
+    el.innerHTML=data.backups.map(file=>`
+      <div class="backup">
+        <span>${escapeHtml(file)}</span>
+        <button class="light" onclick="restoreBackup('${encodeURIComponent(file)}')">Restore</button>
+      </div>
+    `).join('');
+  }catch(e){}
+}
+
+async function restoreBackup(encoded){
+  const filename=decodeURIComponent(encoded);
+
+  if(!confirm('Restore '+filename+' as the live homepage?')) return;
+
+  try{
+    await api('/api/website-studio/website/restore',{
+      method:'POST',
+      body:JSON.stringify({filename})
+    });
+
+    alert('Website restored.');
+    await loadWebsite();
+  }catch(e){
+    alert(e.message);
+  }
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g,m=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#039;'
+  }[m]));
+}
+
+async function logout(){
+  try{
+    await fetch('/api/auth/logout',{
+      method:'POST',
+      credentials:'same-origin'
+    });
+  }catch(e){}
+  location.href='/assessor';
+}
+
+(async()=>{
+  if(await checkLogin()) loadWebsite();
+})();
+</script>
+</body>
+</html>

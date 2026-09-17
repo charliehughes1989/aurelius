@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurelius Fire | Fire Risk Assessments</title>
+<meta name="description" content="Professional fire risk assessments for UK commercial premises. Clear pricing, straightforward booking and practical compliance support.">
+
+<style>
+:root{
+ --navy:#101827;
+ --navy2:#172033;
+ --red:#d71920;
+ --red2:#b9151b;
+ --text:#172033;
+ --muted:#667085;
+ --line:#e6e9ee;
+ --soft:#f6f8fb;
+ --white:#fff;
+ --radius:18px;
+ --shadow:0 18px 60px rgba(16,24,39,.10);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+ margin:0;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+ color:var(--text);
+ background:#fff;
+}
+a{text-decoration:none;color:inherit}
+button,input,textarea,select{font:inherit}
+
+.container{
+ width:min(1180px,92%);
+ margin:auto;
+}
+
+.nav{
+ height:76px;
+ position:sticky;
+ top:0;
+ z-index:100;
+ background:rgba(255,255,255,.94);
+ backdrop-filter:blur(18px);
+ border-bottom:1px solid var(--line);
+}
+
+.nav-inner{
+ height:100%;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:30px;
+}
+
+.logo{
+ font-size:22px;
+ font-weight:900;
+ letter-spacing:-.6px;
+}
+
+.logo span{color:var(--red)}
+
+.navlinks{
+ display:flex;
+ align-items:center;
+ gap:24px;
+ font-size:14px;
+ font-weight:700;
+}
+
+.navlinks a:hover{color:var(--red)}
+
+.nav-actions{
+ display:flex;
+ gap:9px;
+ align-items:center;
+}
+
+.btn{
+ border:0;
+ border-radius:10px;
+ padding:13px 19px;
+ cursor:pointer;
+ font-weight:800;
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ gap:8px;
+ transition:.18s;
+}
+
+.btn:hover{
+ transform:translateY(-1px);
+}
+
+.btn-red{
+ background:var(--red);
+ color:#fff;
+}
+
+.btn-red:hover{background:var(--red2)}
+
+.btn-dark{
+ background:var(--navy);
+ color:#fff;
+}
+
+.btn-light{
+ background:#f0f2f5;
+ color:var(--text);
+}
+
+.btn-outline{
+ background:#fff;
+ border:1px solid #d9dee7;
+ color:var(--text);
+}
+
+.hero{
+ background:
+ radial-gradient(circle at 85% 25%,rgba(215,25,32,.10),transparent 28%),
+ linear-gradient(135deg,#f7f9fc,#fff);
+ padding:100px 0 90px;
+}
+
+.hero-grid{
+ display:grid;
+ grid-template-columns:1.15fr .85fr;
+ gap:70px;
+ align-items:center;
+}
+
+.eyebrow{
+ color:var(--red);
+ font-size:13px;
+ font-weight:900;
+ letter-spacing:1.3px;
+ text-transform:uppercase;
+ margin-bottom:18px;
+}
+
+.hero h1{
+ font-size:clamp(45px,6vw,72px);
+ line-height:.98;
+ letter-spacing:-3.5px;
+ margin:0 0 25px;
+}
+
+.hero h1 span{color:var(--red)}
+
+.hero p{
+ color:var(--muted);
+ font-size:19px;
+ line-height:1.7;
+ max-width:680px;
+ margin:0 0 30px;
+}
+
+.hero-actions{
+ display:flex;
+ flex-wrap:wrap;
+ gap:12px;
+}
+
+.trust-row{
+ display:flex;
+ flex-wrap:wrap;
+ gap:18px;
+ margin-top:30px;
+ color:#657084;
+ font-size:13px;
+ font-weight:700;
+}
+
+.trust-row span{
+ display:flex;
+ align-items:center;
+ gap:7px;
+}
+
+.hero-card{
+ background:var(--navy);
+ color:#fff;
+ padding:34px;
+ border-radius:24px;
+ box-shadow:var(--shadow);
+}
+
+.hero-card h2{
+ margin:0 0 8px;
+ font-size:25px;
+}
+
+.hero-card p{
+ color:#c9d0da;
+ font-size:14px;
+ margin-bottom:25px;
+}
+
+.quick-options{
+ display:grid;
+ gap:10px;
+}
+
+.quick-option{
+ background:#202b40;
+ border:1px solid #344056;
+ border-radius:13px;
+ padding:16px;
+ color:#fff;
+ cursor:pointer;
+ text-align:left;
+}
+
+.quick-option:hover{
+ border-color:#e84b50;
+ background:#27334a;
+}
+
+.quick-option strong{
+ display:block;
+ margin-bottom:4px;
+}
+
+.quick-option small{color:#b8c0cd}
+
+section{
+ padding:95px 0;
+}
+
+.section-title{
+ max-width:720px;
+ margin-bottom:48px;
+}
+
+.section-title h2{
+ font-size:43px;
+ letter-spacing:-2px;
+ margin:0 0 12px;
+}
+
+.section-title p{
+ color:var(--muted);
+ font-size:17px;
+ line-height:1.7;
+ margin:0;
+}
+
+.cards{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:18px;
+}
+
+.card{
+ background:#fff;
+ border:1px solid var(--line);
+ border-radius:18px;
+ padding:28px;
+ box-shadow:0 8px 30px rgba(16,24,39,.03);
+}
+
+.price-card{
+ position:relative;
+ transition:.2s;
+}
+
+.price-card:hover{
+ transform:translateY(-4px);
+ box-shadow:var(--shadow);
+}
+
+.price-card.featured{
+ border:2px solid var(--red);
+}
+
+.badge{
+ position:absolute;
+ right:18px;
+ top:18px;
+ background:var(--red);
+ color:#fff;
+ border-radius:30px;
+ padding:5px 9px;
+ font-size:10px;
+ font-weight:900;
+}
+
+.price{
+ font-size:40px;
+ font-weight:900;
+ letter-spacing:-1px;
+ margin:14px 0;
+}
+
+.card p{
+ color:var(--muted);
+ line-height:1.6;
+}
+
+.card ul{
+ padding-left:20px;
+ color:#586375;
+ line-height:1.9;
+}
+
+.card .btn{
+ width:100%;
+ margin-top:15px;
+}
+
+.scope{
+ background:var(--soft);
+}
+
+.scope-grid{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:18px;
+}
+
+.scope-item{
+ background:#fff;
+ border:1px solid var(--line);
+ border-radius:17px;
+ padding:25px;
+}
+
+.scope-icon{
+ width:40px;
+ height:40px;
+ border-radius:10px;
+ background:#fff0f1;
+ color:var(--red);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-weight:900;
+ margin-bottom:16px;
+}
+
+.scope-item h3{margin:0 0 8px}
+.scope-item p{margin:0;color:var(--muted);line-height:1.6}
+
+.steps{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:20px;
+}
+
+.step{
+ padding:30px;
+ border:1px solid var(--line);
+ border-radius:18px;
+}
+
+.step-number{
+ color:var(--red);
+ font-weight:900;
+ font-size:35px;
+}
+
+.about{
+ background:var(--navy);
+ color:#fff;
+}
+
+.about-grid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:70px;
+ align-items:center;
+}
+
+.about p{
+ color:#c7ced8;
+ line-height:1.8;
+}
+
+.about-photo{
+ min-height:400px;
+ border-radius:22px;
+ background:#263248;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ color:#8893a5;
+ font-weight:800;
+}
+
+.faq{
+ background:var(--soft);
+}
+
+.faq-list{
+ display:grid;
+ gap:10px;
+ max-width:900px;
+}
+
+.faq-item{
+ background:#fff;
+ border:1px solid var(--line);
+ border-radius:13px;
+ overflow:hidden;
+}
+
+.faq-q{
+ width:100%;
+ border:0;
+ background:#fff;
+ padding:20px;
+ text-align:left;
+ font-weight:800;
+ cursor:pointer;
+ display:flex;
+ justify-content:space-between;
+}
+
+.faq-a{
+ display:none;
+ padding:0 20px 20px;
+ color:var(--muted);
+ line-height:1.7;
+}
+
+.faq-item.open .faq-a{display:block}
+
+.cta{
+ background:var(--red);
+ color:#fff;
+ text-align:center;
+}
+
+.cta h2{
+ font-size:45px;
+ letter-spacing:-2px;
+ margin:0 0 12px;
+}
+
+.cta p{
+ opacity:.9;
+ margin-bottom:25px;
+}
+
+footer{
+ background:#0b111c;
+ color:#aeb7c5;
+ padding:50px 0;
+}
+
+.footer-grid{
+ display:grid;
+ grid-template-columns:2fr 1fr 1fr;
+ gap:50px;
+}
+
+footer strong{
+ color:#fff;
+ font-size:18px;
+}
+
+footer h4{
+ color:#fff;
+ margin-top:0;
+}
+
+footer a{
+ display:block;
+ margin:10px 0;
+ font-size:14px;
+}
+
+.modal{
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.65);
+ z-index:500;
+ display:none;
+ align-items:center;
+ justify-content:center;
+ padding:20px;
+}
+
+.modal.open{display:flex}
+
+.modal-box{
+ width:min(720px,100%);
+ max-height:90vh;
+ overflow:auto;
+ background:#fff;
+ border-radius:20px;
+ padding:32px;
+ box-shadow:0 30px 100px rgba(0,0,0,.3);
+}
+
+.modal-head{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+}
+
+.close{
+ border:0;
+ background:#f1f3f6;
+ width:36px;
+ height:36px;
+ border-radius:50%;
+ cursor:pointer;
+ font-size:20px;
+}
+
+.form-grid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+}
+
+.form-grid .full{grid-column:1/-1}
+
+label{
+ display:block;
+ font-size:12px;
+ font-weight:800;
+ margin-bottom:5px;
+}
+
+input,textarea,select{
+ width:100%;
+ padding:13px;
+ border:1px solid #d9dee7;
+ border-radius:9px;
+ outline:none;
+}
+
+textarea{
+ min-height:110px;
+ resize:vertical;
+}
+
+input:focus,textarea:focus,select:focus{
+ border-color:var(--red);
+ box-shadow:0 0 0 3px rgba(215,25,32,.08);
+}
+
+.result{
+ margin-top:15px;
+ padding:14px;
+ border-radius:10px;
+ background:#f4f6f8;
+ display:none;
+}
+
+@media(max-width:1000px){
+ .hero-grid,.about-grid{grid-template-columns:1fr}
+ .cards{grid-template-columns:1fr 1fr}
+ .scope-grid{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:700px){
+ .navlinks{display:none}
+ .nav-actions .btn-light{display:none}
+ .hero{padding:70px 0}
+ section{padding:65px 0}
+ .cards,.scope-grid,.steps,.footer-grid{grid-template-columns:1fr}
+ .form-grid{grid-template-columns:1fr}
+ .form-grid .full{grid-column:auto}
+ .hero h1{letter-spacing:-2px}
+}
+</style>
+</head>
+
+<body>
+
+<header class="nav">
+<div class="container nav-inner">
+<a class="logo" href="/">AURELIUS <span>FIRE</span></a>
+
+<nav class="navlinks">
+<a href="#services">Services</a>
+<a href="#pricing">Pricing</a>
+<a href="#process">How it works</a>
+<a href="#faq">FAQ</a>
+<a href="#about">About</a>
+</nav>
+
+<div class="nav-actions">
+<a class="btn btn-light" href="/client">Client Portal</a>
+<a class="btn btn-dark" href="/assessor">Assessor / Admin</a>
+</div>
+</div>
+</header>
+
+<main>
+
+<section class="hero">
+<div class="container hero-grid">
+
+<div>
+<div class="eyebrow">Independent Fire Risk Assessment</div>
+
+<h1>
+Clear fire safety.<br>
+<strong>Without the complication.</strong>
+</h1>
+
+<p>
+Professional fire risk assessments for straightforward non-sleeping commercial premises, with clear pricing, practical reporting and a simple digital client journey.
+</p>
+
+<div class="hero-actions">
+<button class="btn btn-red" onclick="openQuote()">Get a fixed-price quote →</button>
+<a class="btn btn-outline" href="#pricing">View pricing</a>
+</div>
+
+<div class="trust-row">
+<span>✓ Commercial premises</span>
+<span>✓ Clear fixed pricing</span>
+<span>✓ Digital reporting</span>
+<span>✓ Practical actions</span>
+</div>
+</div>
+
+<div class="hero-card">
+<h2>What do you need?</h2>
+<p>Choose the route that best describes what you're looking for.</p>
+
+<div class="quick-options">
+<button class="quick-option" onclick="openQuote('I need a new fire risk assessment')">
+<strong>🔥 I need a fire risk assessment</strong>
+<small>Get a quote based on your premises.</small>
+</button>
+
+<button class="quick-option" onclick="openQuote('I need to review an existing assessment')">
+<strong>📄 I need to review an existing assessment</strong>
+<small>Tell us what you currently have.</small>
+</button>
+
+<button class="quick-option" onclick="openQuote('I need help with fire safety compliance')">
+<strong>✓ I need compliance support</strong>
+<small>Discuss your requirements.</small>
+</button>
+
+<button class="quick-option" onclick="location.href='/client'">
+<strong>🔐 I am an existing client</strong>
+<small>Open your client portal.</small>
+</button>
+</div>
+</div>
+
+</div>
+</section>
+
+<section id="services">
+<div class="container">
+<div class="section-title">
+<div class="eyebrow">What we do</div>
+<h2>Practical fire safety for real businesses.</h2>
+<p>
+A straightforward service designed around the information you actually need: what needs attention, why it matters and what should happen next.
+</p>
+</div>
+
+<div class="scope-grid">
+
+<div class="scope-item">
+<div class="scope-icon">01</div>
+<h3>Fire Risk Assessments</h3>
+<p>Visual Type 1, non-intrusive assessments for suitable non-sleeping commercial premises.</p>
+</div>
+
+<div class="scope-item">
+<div class="scope-icon">02</div>
+<h3>Action Management</h3>
+<p>Clear prioritised actions with sensible timescales so responsibilities are easy to understand.</p>
+</div>
+
+<div class="scope-item">
+<div class="scope-icon">03</div>
+<h3>Compliance Support</h3>
+<p>Practical support around documentation, fire safety arrangements and ongoing management.</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<section id="pricing" class="scope">
+<div class="container">
+<div class="section-title">
+<div class="eyebrow">Simple pricing</div>
+<h2>Fixed prices. No guessing.</h2>
+<p>Our standard packages are designed around straightforward non-sleeping commercial premises.</p>
+</div>
+
+<div class="cards">
+
+<div class="card price-card">
+<h3>Small</h3>
+<div class="price">£345</div>
+<p>One floor, no sleeping accommodation.</p>
+<ul>
+<li>Small commercial premises</li>
+<li>Visual Type 1 assessment</li>
+<li>Digital report</li>
+<li>Prioritised actions</li>
+</ul>
+<button class="btn btn-dark" onclick="openQuote('Small')">Choose Small →</button>
+</div>
+
+<div class="card price-card">
+<h3>Standard</h3>
+<div class="price">£495</div>
+<p>Two floors, no sleeping accommodation.</p>
+<ul>
+<li>Commercial premises</li>
+<li>Visual Type 1 assessment</li>
+<li>Digital report</li>
+<li>Prioritised actions</li>
+</ul>
+<button class="btn btn-dark" onclick="openQuote('Standard')">Choose Standard →</button>
+</div>
+
+<div class="card price-card featured">
+<span class="badge">POPULAR</span>
+<h3>Larger</h3>
+<div class="price">£695</div>
+<p>Three floors or larger footprint.</p>
+<ul>
+<li>Larger commercial premises</li>
+<li>Detailed visual assessment</li>
+<li>Digital report</li>
+<li>Prioritised actions</li>
+</ul>
+<button class="btn btn-red" onclick="openQuote('Larger')">Choose Larger →</button>
+</div>
+
+<div class="card price-card">
+<h3>Complex</h3>
+<div class="price">£995</div>
+<p>Four or more floors or larger complex premises.</p>
+<ul>
+<li>Complex commercial premises</li>
+<li>Detailed visual assessment</li>
+<li>Digital report</li>
+<li>Prioritised actions</li>
+</ul>
+<button class="btn btn-dark" onclick="openQuote('Complex')">Choose Complex →</button>
+</div>
+
+</div>
+</div>
+</section>
+
+<section id="process">
+<div class="container">
+<div class="section-title">
+<div class="eyebrow">The process</div>
+<h2>From enquiry to report.</h2>
+<p>Everything is managed through one straightforward digital journey.</p>
+</div>
+
+<div class="steps">
+<div class="step">
+<div class="step-number">01</div>
+<h3>Tell us about your premises</h3>
+<p>Give us the basic information about your business, premises, size and occupancy.</p>
+</div>
+
+<div class="step">
+<div class="step-number">02</div>
+<h3>Confirm your assessment</h3>
+<p>Receive your quote, review the terms, complete onboarding and select an available appointment.</p>
+</div>
+
+<div class="step">
+<div class="step-number">03</div>
+<h3>Receive your report</h3>
+<p>Your final report, actions and supporting documents are securely managed through your portal.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="about" id="about">
+<div class="container about-grid">
+<div>
+<div class="eyebrow">About Aurelius Fire</div>
+<h2>Independent. Practical. Straightforward.</h2>
+<p>
+Aurelius Fire provides independent fire risk assessment services for commercial premises, focused on practical life safety and clear reporting.
+</p>
+<p>
+The aim is simple: identify meaningful risks, explain them clearly and provide sensible actions without unnecessary complication.
+</p>
+<button class="btn btn-red" onclick="openQuote()">Start an enquiry →</button>
+</div>
+
+<div class="about-photo" id="about-photo">
+Your photo / About image
+</div>
+</div>
+</section>
+
+<section id="faq" class="faq">
+<div class="container">
+<div class="section-title">
+<div class="eyebrow">Questions</div>
+<h2>Frequently asked questions.</h2>
+<p>Some of the questions we get asked most often.</p>
+</div>
+
+<div class="faq-list">
+
+<div class="faq-item">
+<button class="faq-q" onclick="toggleFaq(this)">
+Who is the service suitable for?
+<span>+</span>
+</button>
+<div class="faq-a">
+The standard service is aimed at straightforward non-sleeping commercial premises such as shops, offices, salons, gyms and similar premises.
+</div>
+</div>
+
+<div class="faq-item">
+<button class="faq-q" onclick="toggleFaq(this)">
+Is the assessment intrusive?
+<span>+</span>
+</button>
+<div class="faq-a">
+The standard assessment is Type 1 and non-intrusive. Accessible areas are visually inspected; concealed construction and hidden compartmentation are outside the standard scope.
+</div>
+</div>
+
+<div class="faq-item">
+<button class="faq-q" onclick="toggleFaq(this)">
+Can I manage everything online?
+<span>+</span>
+</button>
+<div class="faq-a">
+Yes. Quotes, terms, booking information, documents and actions are designed to be managed through the client portal.
+</div>
+</div>
+
+<div class="faq-item">
+<button class="faq-q" onclick="toggleFaq(this)">
+What if my premises are outside the standard scope?
+<span>+</span>
+</button>
+<div class="faq-a">
+Tell us about the premises through the enquiry form. We can review the information and advise whether the standard service is appropriate.
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="cta">
+<div class="container">
+<h2>Ready to get started?</h2>
+<p>Tell us about your premises and receive the appropriate quote.</p>
+<button class="btn btn-dark" onclick="openQuote()">Get a quote →</button>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="container footer-grid">
+
+<div>
+<strong>AURELIUS FIRE</strong>
+<p>Independent Fire Risk Assessment Services.</p>
+<p>Professional, practical and straightforward.</p>
+</div>
+
+<div>
+<h4>Explore</h4>
+<a href="#services">Services</a>
+<a href="#pricing">Pricing</a>
+<a href="#faq">FAQ</a>
+<a href="#about">About</a>
+</div>
+
+<div>
+<h4>Access</h4>
+<a href="/client">Client Portal</a>
+<a href="/assessor">Assessor / Admin</a>
+<a href="/terms.html">Terms</a>
+<a href="/privacy.html">Privacy</a>
+</div>
+
+</div>
+</footer>
+
+<div class="modal" id="quoteModal">
+<div class="modal-box">
+
+<div class="modal-head">
+<div>
+<div class="eyebrow">Get started</div>
+<h2>Tell us about your premises</h2>
+</div>
+<button class="close" onclick="closeQuote()">×</button>
+</div>
+
+<p style="color:#667085">
+Give us the basics below. The CRM will save the enquiry so it can be reviewed and progressed.
+</p>
+
+<form id="quoteForm">
+
+<div class="form-grid">
+
+<div>
+<label>Your name</label>
+<input required name="customerName">
+</div>
+
+<div>
+<label>Company</label>
+<input required name="companyName">
+</div>
+
+<div>
+<label>Email</label>
+<input required type="email" name="email">
+</div>
+
+<div>
+<label>Telephone</label>
+<input required name="telephone">
+</div>
+
+<div class="full">
+<label>Premises address</label>
+<textarea required name="premisesAddress"></textarea>
+</div>
+
+<div>
+<label>Postcode</label>
+<input required name="postcode">
+</div>
+
+<div>
+<label>Premises type</label>
+<select required name="premisesType">
+<option value="">Choose...</option>
+<option>Shop</option>
+<option>Office</option>
+<option>Salon / Barber</option>
+<option>Gym / Leisure</option>
+<option>Warehouse / Unit</option>
+<option>Café / Restaurant</option>
+<option>Other commercial premises</option>
+</select>
+</div>
+
+<div>
+<label>Number of floors</label>
+<select name="floors">
+<option>1</option>
+<option>2</option>
+<option>3</option>
+<option>4+</option>
+</select>
+</div>
+
+<div>
+<label>Approximate size</label>
+<input name="approximateSize" placeholder="e.g. 250 m²">
+</div>
+
+<div>
+<label>Sleeping accommodation?</label>
+<select name="sleepingAccommodation">
+<option value="false">No</option>
+<option value="true">Yes</option>
+</select>
+</div>
+
+<div class="full">
+<label>Anything else we should know?</label>
+<textarea name="additionalInformation"></textarea>
+</div>
+
+</div>
+
+<button class="btn btn-red" style="width:100%;margin-top:12px">
+Submit enquiry →
+</button>
+
+</form>
+
+<div class="result" id="quoteResult"></div>
+
+</div>
+</div>
+
+<script>
+function openQuote(option){
+ document.getElementById('quoteModal').classList.add('open');
+ if(option && typeof option==='string'){
+   const box=document.querySelector('[name="additionalInformation"]');
+   if(box && !box.value) box.value=option;
+ }
+}
+
+function closeQuote(){
+ document.getElementById('quoteModal').classList.remove('open');
+}
+
+function toggleFaq(btn){
+ const item=btn.closest('.faq-item');
+ item.classList.toggle('open');
+ btn.querySelector('span').textContent=item.classList.contains('open')?'−':'+';
+}
+
+document.getElementById('quoteForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+
+ const form=e.target;
+ const result=document.getElementById('quoteResult');
+ const data=Object.fromEntries(new FormData(form));
+
+ result.style.display='block';
+ result.textContent='Sending your enquiry...';
+
+ try{
+   const r=await fetch('/api/quotes',{
+     method:'POST',
+     headers:{'Content-Type':'application/json'},
+     body:JSON.stringify(data)
+   });
+
+   if(!r.ok) throw new Error('quote endpoint unavailable');
+
+   result.innerHTML='<strong>Enquiry received.</strong><br>Thank you. Your information has been sent to Aurelius Fire.';
+   form.style.display='none';
+ }catch(err){
+   result.innerHTML='<strong>Thank you.</strong><br>Your enquiry has been prepared. Please contact Aurelius Fire if you need immediate assistance.';
+ }
+});
+</script>
+
+</body>
+</html>
