@@ -57,6 +57,13 @@ router.post('/quote/:id/accept', (req, res) => {
 
   const data = json(quote.data_json || '{}');
 
+  const clientId = String(
+    data.clientId ||
+    data.client_id ||
+    quote.client_id ||
+    ''
+  );
+
   const updated = updateEntity(
     req.params.id,
     {
@@ -196,6 +203,19 @@ router.post('/terms/sign', (req, res) => {
   }
 
   const timestamp = now();
+
+  const quoteForWorkflow = getEntity(quote_id);
+
+  const quoteWorkflowData = quoteForWorkflow
+    ? json(quoteForWorkflow.data_json || '{}')
+    : {};
+
+  const clientId = String(
+    quoteWorkflowData.clientId ||
+    quoteWorkflowData.client_id ||
+    quoteForWorkflow?.client_id ||
+    ''
+  );
 
   const updated = updateEntity(
     quote_id,
