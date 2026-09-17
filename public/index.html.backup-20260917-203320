@@ -70,7 +70,7 @@ label{font-size:13px;font-weight:700}
 <a href="/portal">Client Portal</a>
 <button class="btn red" onclick="openQuote()">Get a Quote</button>
 </div>
-<a href="/assessor" style="font-weight:700;">Assessor / Admin Login</a></nav>
+</nav>
 
 <header class="hero">
 <div>
