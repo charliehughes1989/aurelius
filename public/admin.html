@@ -1073,5 +1073,114 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+
+<section id="automation-centre" style="margin:28px 0;padding:24px;border:1px solid #e5e7eb;border-radius:18px;background:#fff">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#2563eb">AURELIUS AUTOMATION CENTRE</div>
+      <h2 style="margin:6px 0">Workflow control</h2>
+      <p style="margin:0;color:#64748b">See exactly what needs attention without manually checking every client.</p>
+    </div>
+    <button id="runAutomation" style="padding:11px 16px;border:0;border-radius:10px;background:#2563eb;color:#fff;font-weight:700;cursor:pointer">Run automation</button>
+  </div>
+
+  <div id="automationStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:20px"></div>
+
+  <div id="automationStages" style="margin-top:20px"></div>
+
+  <div id="automationMessage" style="margin-top:12px;color:#64748b;font-size:13px"></div>
+</section>
+
+<script>
+(function(){
+  async function loadAutomation(){
+    const stats = document.getElementById('automationStats');
+    const stages = document.getElementById('automationStages');
+    const message = document.getElementById('automationMessage');
+
+    if(!stats) return;
+
+    try {
+      const r = await fetch('/api/automation/dashboard', {credentials:'include'});
+      if(!r.ok) {
+        message.textContent = 'Automation dashboard requires an administrator session.';
+        return;
+      }
+
+      const data = await r.json();
+      const s = data.summary || {};
+
+      const cards = [
+        ['Enquiries',s.enquiries],
+        ['Quotes',s.quotes],
+        ['Accepted',s.accepted],
+        ['Onboarding',s.onboarding],
+        ['Ready to book',s.readyToBook],
+        ['Booked',s.booked],
+        ['Assessments',s.assessment],
+        ['Reports',s.report],
+        ['Open actions',s.actions],
+        ['Overdue actions',s.overdueActions],
+        ['Complete',s.complete]
+      ];
+
+      stats.innerHTML = cards.map(x =>
+        '<div style="padding:15px;border:1px solid #e5e7eb;border-radius:12px;background:#f8fafc">' +
+        '<div style="font-size:12px;color:#64748b">'+x[0]+'</div>' +
+        '<div style="font-size:25px;font-weight:800;margin-top:4px">'+(x[1]||0)+'</div>' +
+        '</div>'
+      ).join('');
+
+      const sr = await fetch('/api/automation/stages',{credentials:'include'});
+      if(sr.ok){
+        const stageData = await sr.json();
+        const grouped = stageData.stages || {};
+        stages.innerHTML = Object.keys(grouped).map(stage => {
+          const count = (grouped[stage] || []).length;
+          return '<div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #eef2f7">' +
+            '<span style="text-transform:capitalize">'+stage.replace(/_/g,' ')+'</span>' +
+            '<strong>'+count+'</strong>' +
+          '</div>';
+        }).join('');
+      }
+
+      message.textContent = 'Automation status refreshed '+new Date().toLocaleTimeString();
+    } catch(e) {
+      message.textContent = 'Unable to load automation dashboard.';
+    }
+  }
+
+  async function runAutomation(){
+    const message = document.getElementById('automationMessage');
+    if(message) message.textContent = 'Processing workflows...';
+
+    try {
+      const r = await fetch('/api/automation/process',{
+        method:'POST',
+        credentials:'include',
+        headers:{'Content-Type':'application/json'},
+        body:'{}'
+      });
+
+      if(message) {
+        message.textContent = r.ok
+          ? 'Automation completed successfully.'
+          : 'Automation could not be run.';
+      }
+
+      await loadAutomation();
+    } catch(e) {
+      if(message) message.textContent = 'Automation request failed.';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded',function(){
+    loadAutomation();
+    const button=document.getElementById('runAutomation');
+    if(button) button.addEventListener('click',runAutomation);
+  });
+})();
+</script>
+
 </body>
 </html>

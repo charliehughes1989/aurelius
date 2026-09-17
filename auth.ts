@@ -4,6 +4,26 @@ import { db, id, now, writeAudit } from './database.ts';
 
 export type User = { id: string; email: string; role: string; displayName: string; clientId: string | null };
 const sessionCookie = 'aurelius_session';
+
+export const ADMIN_ROLES = [
+  'super_admin',
+  'admin',
+  'owner',
+  'assessor'
+];
+
+export const CLIENT_ROLES = [
+  'client'
+];
+
+export function isAdminRole(role: string | undefined) {
+  return !!role && ADMIN_ROLES.includes(role);
+}
+
+export function isClientRole(role: string | undefined) {
+  return !!role && CLIENT_ROLES.includes(role);
+}
+
 const hash = (value: string) => crypto.createHash('sha256').update(value).digest('hex');
 const passwordHash = (value: string, salt = crypto.randomBytes(16).toString('hex')) => `${salt}:${crypto.scryptSync(value, salt, 64).toString('hex')}`;
 const passwordMatches = (value: string, stored: string) => { const [salt, digest] = stored.split(':'); return !!salt && !!digest && crypto.timingSafeEqual(Buffer.from(digest, 'hex'), crypto.scryptSync(value, salt, 64)); };

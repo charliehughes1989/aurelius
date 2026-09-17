@@ -11,7 +11,11 @@ import {
 const router = Router();
 
 function actor(req: any) {
-  return req?.user || {};
+  const u = req?.user || {};
+  return {
+    id: u.id || 'system',
+    role: u.role || 'system'
+  };
 }
 
 function id(prefix: string) {
@@ -104,8 +108,7 @@ router.get('/summary', (req, res) => {
     },
     actor: {
       id: user?.id || null,
-      role: user?.role || null,
-      email: user?.email || null
+      role: user?.role || null
     }
   });
 });

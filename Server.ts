@@ -20,8 +20,12 @@ import aiWebsite from './AIWebsite.ts';
 import aiControl from './AIControl.ts';
 import productionWorkflow from './ProductionWorkflow.ts';
 import completionSuite from './CompletionSuite.ts';
+import automationApi from './AutomationAPI.ts';
+import { startAutomationWorker } from './AutomationWorker.ts';
 
 const app = express();
+
+startAutomationWorker();
 const publicDir = path.join(process.cwd(), 'public');
 const uploadDir = path.join(process.cwd(), 'data', 'uploads');
 fs.mkdirSync(publicDir, { recursive: true });
@@ -148,6 +152,7 @@ app.get('/api/public/booking-availability', (req, res) => {
 app.use('/api/admin', authRequired, adminRoutes);
 app.use('/api/workflow', authRequired, productionWorkflow);
 app.use('/api/completion', authRequired, completionSuite);
+app.use('/api/automation', authRequired, automationApi);
 app.use('/api/client-portal', authRequired, clientPortal);
 app.use('/api/client-accounts', authRequired, clientAccounts);
 app.use('/api/ai', authRequired, aiControl);
@@ -249,6 +254,38 @@ app.use('/api/documents-actions', documentsActions);
 app.use('/api/file-uploads', fileUploads);
 app.use('/api/stripe-checkout', stripeCheckout);
 app.use('/api/onboarding-automation', onboardingAutomation);
+
+
+app.post('/api/public/enquiry', express.json({limit:'2mb'}), async (req, res) => {
+  try {
+    const { createEnquiryPipeline } = await import('./AutomationEngine.ts');
+
+    const input = req.body || {};
+
+    if (!input.email) {
+      return res.status(400).json({error:'Email is required'});
+    }
+
+    const result = createEnquiryPipeline(input);
+
+    res.status(201).json({
+      ok:true,
+      message:'Enquiry received',
+      clientId:result.client.id,
+      premiseId:result.premise.id,
+      enquiryId:result.enquiry.id,
+      quote:result.quote?.price ? {
+        id:result.quote.id,
+        service:result.quote.service,
+        amount:result.quote.amount,
+        currency:'GBP'
+      } : null
+    });
+  } catch (error:any) {
+    console.error('Public enquiry error:',error);
+    res.status(500).json({error:'Unable to process enquiry'});
+  }
+});
 
 app.get('/', (_req, res) => {
   let html = fs.readFileSync(path.join(publicDir, 'index.html'), 'utf8');

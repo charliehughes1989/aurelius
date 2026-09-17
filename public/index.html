@@ -182,5 +182,115 @@ document.getElementById('quoteResult').innerHTML='<p>Thank you. Your enquiry has
 }
 };
 </script>
+
+<script id="aurelius-public-enquiry-handler">
+(function(){
+  function findForm(){
+    const forms=[...document.querySelectorAll('form')];
+    return forms.find(f =>
+      /enquir|quote|assessment|contact|book/i.test(
+        (f.innerText||'')+' '+(f.getAttribute('action')||'')+' '+(f.id||'')
+      )
+    );
+  }
+
+  async function submitEnquiry(form){
+    const data={};
+    new FormData(form).forEach((value,key)=>{
+      data[key]=value;
+    });
+
+    const normalised={
+      clientName:data.clientName || data.name || data.fullName || data.contactName || '',
+      name:data.name || data.clientName || '',
+      email:data.email || data.emailAddress || '',
+      phone:data.phone || data.telephone || '',
+      company:data.company || data.businessName || data.organisation || '',
+      businessName:data.businessName || data.company || '',
+      premiseName:data.premiseName || data.businessName || data.company || 'Premises',
+      address:data.address || data.siteAddress || '',
+      postcode:data.postcode || data.postCode || '',
+      floors:data.floors || data.numberOfFloors || 1,
+      floorAreaSqFt:data.floorAreaSqFt || data.area || data.sizeSqFt || '',
+      useType:data.useType || data.businessType || data.premiseType || '',
+      occupancy:data.occupancy || '',
+      sleepingAccommodation:!!(
+        data.sleepingAccommodation ||
+        data.sleeping ||
+        data.hasSleepingAccommodation
+      ),
+      message:data.message || data.notes || data.enquiry || '',
+      source:'website'
+    };
+
+    if(!normalised.email){
+      return;
+    }
+
+    const response=await fetch('/api/public/enquiry',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(normalised)
+    });
+
+    if(!response.ok) throw new Error('Enquiry failed');
+
+    return response.json();
+  }
+
+  document.addEventListener('submit',async function(event){
+    const form=event.target;
+    if(!(form instanceof HTMLFormElement)) return;
+
+    const action=(form.getAttribute('action')||'').toLowerCase();
+
+    if(
+      !/enquir|quote|assessment|contact/i.test(
+        (form.innerText||'')+' '+action+' '+(form.id||'')
+      )
+    ) return;
+
+    if(form.dataset.aureliusPublicEnquiryHandler==='1') return;
+
+    event.preventDefault();
+    form.dataset.aureliusPublicEnquiryHandler='1';
+
+    try{
+      const result=await submitEnquiry(form);
+
+      const quote=result && result.quote;
+
+      const message=quote
+        ? 'Thank you. Your enquiry has been received and your indicative fixed quote is £'+quote.amount+'.'
+        : 'Thank you. Your enquiry has been received. We will review the premises details and contact you.';
+
+      let notice=form.querySelector('.aurelius-enquiry-result');
+
+      if(!notice){
+        notice=document.createElement('div');
+        notice.className='aurelius-enquiry-result';
+        notice.style.cssText='margin-top:15px;padding:14px;border-radius:10px;background:#eff6ff;color:#1e3a8a;font-weight:600';
+        form.appendChild(notice);
+      }
+
+      notice.textContent=message;
+      form.reset();
+
+    }catch(error){
+      let notice=form.querySelector('.aurelius-enquiry-result');
+
+      if(!notice){
+        notice=document.createElement('div');
+        notice.className='aurelius-enquiry-result';
+        notice.style.cssText='margin-top:15px;padding:14px;border-radius:10px;background:#fef2f2;color:#991b1b;font-weight:600';
+        form.appendChild(notice);
+      }
+
+      notice.textContent='We could not submit the enquiry. Please try again.';
+    }
+  });
+})();
+</script>
+
 </body>
 </html>

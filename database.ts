@@ -33,7 +33,7 @@ export function writeAudit(input: { actorId?: string; actorRole?: string; action
 export function saveEntity(type: string, value: Record<string, any>, actor?: { id: string; role: string }, action = 'create') {
   const timestamp = now();
   const record: Record<string, any> = { id: value.id ?? id(), status: value.status ?? 'active', version: value.version ?? 1, createdAt: value.createdAt ?? timestamp, updatedAt: timestamp, ...value };
-  if (type === 'clients' && !record.clientId) record.clientId = record.id;
+  if ((type === 'clients' || type === 'client') && !record.clientId) record.clientId = record.id;
   const previousRow = db.query('SELECT data FROM entities WHERE type=? AND id=?').get(type, record.id) as { data: string } | null;
   db.query('INSERT INTO entities (type,id,status,client_id,data,created_at,updated_at) VALUES (?,?,?,?,?,?,?) ON CONFLICT(type,id) DO UPDATE SET status=excluded.status,client_id=excluded.client_id,data=excluded.data,updated_at=excluded.updated_at').run(type, record.id, record.status, record.clientId ?? null, json(record), record.createdAt, timestamp);
   writeAudit({ actorId: actor?.id, actorRole: actor?.role, action, entityType: type, entityId: record.id, before: previousRow ? parse(previousRow.data) : undefined, after: record });

@@ -1,6 +1,14 @@
 import express from 'express';
+import {
+  runClientAutomation,
+  createOnboardingTasks,
+  createBookingTasks,
+  createAction,
+  actionSummary
+} from './AutomationEngine.ts';
+
 import { db, id, now, parse, saveEntity, listEntities, getEntity, writeAudit, enqueueNotification } from './database.ts';
-import { requireRoles } from './auth.ts';
+import { requireRoles, isAdminRole } from './auth.ts';
 
 const router = express.Router();
 router.use(express.json({ limit: '10mb' }));
@@ -15,7 +23,7 @@ function actor(req: any) {
 }
 
 function admin(req: any) {
-  return ['admin', 'assessor', 'owner'].includes(user(req).role);
+  return isAdminRole(user(req).role);
 }
 
 function ensureAdmin(req: any, res: any, next: any) {
@@ -26,7 +34,8 @@ function ensureAdmin(req: any, res: any, next: any) {
 function clientScope(req: any, requested?: string) {
   const u = user(req);
   if (admin(req)) return requested || undefined;
-  return u.clientId || requested;
+  if (!u.clientId) return null;
+  return u.clientId;
 }
 
 function entity(type: string, data: any, req: any, action = 'create') {
@@ -1227,6 +1236,59 @@ router.get('/health', (_req, res) => {
     version: '2026.09',
     database: 'connected',
     timestamp: now()
+  });
+});
+
+
+router.post('/client/:clientId/automation/run', (req,res) => {
+  const cid = clientScope(req,req.params.clientId);
+
+  if (!cid) {
+    return res.status(403).json({error:'Access denied'});
+  }
+
+  res.json({
+    ok:true,
+    workflow:runClientAutomation(cid,actor(req))
+  });
+});
+
+router.post('/client/:clientId/onboarding/tasks', (req,res) => {
+  const cid = clientScope(req,req.params.clientId);
+
+  if (!cid || !admin(req)) {
+    return res.status(403).json({error:'Administrator access required'});
+  }
+
+  res.json({
+    ok:true,
+    tasks:createOnboardingTasks(cid,actor(req))
+  });
+});
+
+router.post('/client/:clientId/booking/:bookingId/tasks', (req,res) => {
+  if (!admin(req)) {
+    return res.status(403).json({error:'Administrator access required'});
+  }
+
+  res.json({
+    ok:true,
+    tasks:createBookingTasks(
+      req.params.clientId,
+      req.params.bookingId,
+      actor(req)
+    )
+  });
+});
+
+router.get('/client/:clientId/action-summary', (req,res) => {
+  const cid=clientScope(req,req.params.clientId);
+
+  if(!cid) return res.status(403).json({error:'Access denied'});
+
+  res.json({
+    ok:true,
+    summary:actionSummary(cid)
   });
 });
 
